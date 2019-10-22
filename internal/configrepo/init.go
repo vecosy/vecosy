@@ -12,7 +12,7 @@ import (
 	"sort"
 )
 
-var appBranchRe = regexp.MustCompile("refs/heads/([a-z|A-Z|0-9|-|.]*)/([a-z|A-Z|0-9|-|.]*)")
+var appRe = regexp.MustCompile("refs/(heads|tags)/([a-z|A-Z|0-9|-|.]*)/([a-z|A-Z|0-9|-|.]*)")
 
 type App struct {
 	Name     string
@@ -51,44 +51,65 @@ func (cr *ConfigRepo) Init() error {
 	return cr.LoadApps()
 }
 
-func (cr *ConfigRepo) LoadApps() error {
-	branches, err := cr.repo.Branches()
-	if err != nil {
-		return nil
-	}
-	err = branches.ForEach(func(branchRef *plumbing2.Reference) error {
-		branchName := branchRef.Name().String()
-		appMatches := appBranchRe.FindAllStringSubmatch(branchName, 1)
-		if len(appMatches) == 1 && len(appMatches[0]) == 3 {
-			appName := appMatches[0][1]
-			appStrVersion := appMatches[0][2]
-			appVersion, err := version.NewVersion(appStrVersion)
-			if err != nil {
-				logrus.Warnf("Invalid application version:%s err:%s", appVersion, err)
-			} else {
-				logrus.Debugf("appName:%s appVersion:%s", appName, appStrVersion)
-				if _, appFound := cr.Apps[appName]; !appFound {
-					cr.Apps[appName] = NewApp(appName)
-				}
-				cr.Apps[appName].Branches[appStrVersion] = branchRef
-				cr.Apps[appName].Versions = append(cr.Apps[appName].Versions, appVersion)
-			}
+func (cr *ConfigRepo) addApp(branchRef *plumbing2.Reference) error {
+	branchName := branchRef.Name().String()
+	appMatches := appRe.FindAllStringSubmatch(branchName, 1)
+	if len(appMatches) == 1 && len(appMatches[0]) == 4 {
+		appName := appMatches[0][2]
+		appStrVersion := appMatches[0][3]
+		appVersion, err := version.NewVersion(appStrVersion)
+		if err != nil {
+			logrus.Warnf("Invalid application version:%s err:%s", appVersion, err)
 		} else {
-			logrus.Warnf("the branch %s doesn't match with the branch pattern", branchName)
+			logrus.Debugf("appName:%s appVersion:%s", appName, appStrVersion)
+			if _, appFound := cr.Apps[appName]; !appFound {
+				cr.Apps[appName] = NewApp(appName)
+			}
+			cr.Apps[appName].Branches[appStrVersion] = branchRef
+			cr.Apps[appName].Versions = append(cr.Apps[appName].Versions, appVersion)
 		}
-		return nil
-	})
-	for appName, app := range cr.Apps {
-		logrus.Debugf("sorting app %s version", appName)
-		sort.Sort(version.Collection(app.Versions))
-		utils.ReverseVersion(app.Versions)
-		logrus.Debugf("app Versions:%+v", app.Versions)
-	}
-
-	if err != nil {
-		return nil
+	} else {
+		logrus.Warnf("the branch %s doesn't match with the branch pattern", branchName)
 	}
 	return nil
+}
+
+func (cr *ConfigRepo) LoadApps() error {
+	err := cr.loadAppsFromBranches()
+	if err != nil {
+		logrus.Errorf("Error loading apps from branches:%s", err)
+		return err
+	}
+
+	err = cr.loadAppsFromTags()
+	if err != nil {
+		logrus.Errorf("Error loading apps from tags:%s", err)
+		return err
+	}
+
+	for appName, app := range cr.Apps {
+		logrus.Debugf("sorting app:%s versions", appName)
+		sort.Sort(version.Collection(app.Versions))
+		utils.ReverseVersion(app.Versions)
+		logrus.Infof("app:%s Sorted Versions:%+v", appName, app.Versions)
+	}
+	return nil
+}
+
+func (cr *ConfigRepo) loadAppsFromBranches() error {
+	branches, err := cr.repo.Branches()
+	if err != nil {
+		return err
+	}
+	return branches.ForEach(cr.addApp)
+}
+
+func (cr *ConfigRepo) loadAppsFromTags() error {
+	tags, err := cr.repo.Tags()
+	if err != nil {
+		return err
+	}
+	return tags.ForEach(cr.addApp)
 }
 
 func (cr *ConfigRepo) GetNearestBranch(targetApp, targetVersion string) (*plumbing2.Reference, error) {
@@ -108,7 +129,7 @@ func (cr *ConfigRepo) GetNearestBranch(targetApp, targetVersion string) (*plumbi
 	return nil, fmt.Errorf("no branch found for target chkVer:%s", targetVersion)
 }
 
-func (cr *ConfigRepo) GetFile(targetApp, targetVersion, targetEnvironment, path string) (*object.File, error) {
+func (cr *ConfigRepo) GetFile(targetApp, targetVersion, path string) (*object.File, error) {
 	branchRef, err := cr.GetNearestBranch(targetApp, targetVersion)
 	if err != nil {
 		return nil, err
@@ -121,5 +142,5 @@ func (cr *ConfigRepo) GetFile(targetApp, targetVersion, targetEnvironment, path 
 	if err != nil {
 		return nil, err
 	}
-	return tree.File(fmt.Sprintf("%s/%s", targetEnvironment, path))
+	return tree.File(path)
 }
