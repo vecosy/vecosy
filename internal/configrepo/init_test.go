@@ -8,6 +8,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/config"
+	plumbing2 "gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/object"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
@@ -28,8 +30,8 @@ func TestMain(m *testing.M) {
 }
 
 func InitRepos(t *testing.T) (string, string) {
-	localTmpRepo := fmt.Sprintf("%s/%s", os.TempDir(), uuid.New().String())
-	remoteTmpRepo := fmt.Sprintf("%s/%s", os.TempDir(), uuid.New().String())
+	localTmpRepo := fmt.Sprintf("%s/vconf/%s", os.TempDir(), uuid.New().String())
+	remoteTmpRepo := fmt.Sprintf("%s/vconf/%s", os.TempDir(), uuid.New().String())
 	assert.NoError(t, archiver.Unarchive("../../tests/singleConfigRepo.tgz", remoteTmpRepo))
 	return localTmpRepo, remoteTmpRepo + "/singleConfigRepo"
 }
@@ -144,16 +146,17 @@ func TestConfigRepo_Pull(t *testing.T) {
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
 
-	editorRepoPath := fmt.Sprintf("%s/%s", os.TempDir(), uuid.New().String())
-	t.Logf("editorPath:%s",editorRepoPath)
+	editorRepoPath := fmt.Sprintf("%s/vconf/%s", os.TempDir(), uuid.New().String())
+	t.Logf("editorPath:%s", editorRepoPath)
 	//defer os.RemoveAll(editorRepoPath)
 	editorRepo, err := git.PlainClone(editorRepoPath, false, &git.CloneOptions{URL: remoteRepo, NoCheckout: true})
 	assert.NoError(t, err)
 
 	wk, err := editorRepo.Worktree()
 	assert.NoError(t, err)
-	err = wk.Checkout(&git.CheckoutOptions{Branch: "refs/remotes/origin/app1/v1.0.0",})
+	err = wk.Checkout(&git.CheckoutOptions{Branch: "refs/remotes/origin/app1/v1.0.0", Force: true})
 	assert.NoError(t, err)
+
 	fl, err := wk.Filesystem.OpenFile("config.yml", os.O_RDWR, 0644)
 	assert.NoError(t, err)
 	defer fl.Close()
@@ -165,7 +168,16 @@ func TestConfigRepo_Pull(t *testing.T) {
 	assert.NoError(t, err)
 	_, err = wk.Commit("added prop3", &git.CommitOptions{All: true, Author: editorSignature,})
 	assert.NoError(t, err)
-	assert.NoError(t, editorRepo.Push(&git.PushOptions{}))
+
+	head, err := editorRepo.Head()
+	assert.NoError(t, err)
+	branchRef := plumbing2.NewHashReference("refs/heads/app1/v1.0.0", head.Hash())
+	assert.NoError(t, editorRepo.Storer.SetReference(branchRef))
+
+	assert.NoError(t, editorRepo.Push(&git.PushOptions{
+		RemoteName: "origin",
+		RefSpecs:   []config.RefSpec{"refs/heads/app1/v1.0.0:refs/heads/app1/v1.0.0"},
+	}))
 
 	configContent := getConfigYml(t, cfgRepo, "app1", "v1.0.0")
 	assert.Nil(t, configContent["prop3"])
@@ -173,7 +185,6 @@ func TestConfigRepo_Pull(t *testing.T) {
 	assert.NoError(t, cfgRepo.Pull())
 	configContent = getConfigYml(t, cfgRepo, "app1", "v1.0.0")
 	assert.Equal(t, prop3Val, configContent["prop3"])
-
 }
 
 func getConfigYml(t *testing.T, cfgRepo *ConfigRepo, appName, targetVersion string) map[string]interface{} {

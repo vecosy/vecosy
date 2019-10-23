@@ -218,6 +218,7 @@ func (cr *ConfigRepo) Pull() error {
 				logrus.Info("already up to date")
 			}
 		}
+		return cr.LoadApps()
 	} else {
 		logrus.Warn("Cannot pull:no remote information found")
 	}
