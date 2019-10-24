@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/sirupsen/logrus"
-	"github.com/vconf/v2/internal/api"
+	"github.com/vconf/v2/internal/rest"
 	"os"
 	"github.com/spf13/cobra"
 
@@ -18,7 +18,7 @@ var rootCmd = &cobra.Command{
 	Use:   "vconf",
 	Short: "VConf",
 	Run: func(cmd *cobra.Command, args []string) {
-		api.StartServer()
+		rest.StartServer()
 	},
 }
 

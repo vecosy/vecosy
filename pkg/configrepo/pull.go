@@ -1,6 +1,7 @@
 package configrepo
 
 import (
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-git.v4"
 	"time"
@@ -42,7 +43,6 @@ func (cr *ConfigRepo) Pull() error {
 		}
 		return cr.LoadApps()
 	} else {
-		logrus.Warn("Cannot pull:no remote information found")
+		return fmt.Errorf("cannot pull:no remote information found")
 	}
-	return nil
 }

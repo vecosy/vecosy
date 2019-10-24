@@ -10,6 +10,7 @@ import (
 )
 
 func TestConfigRepo_PullingEvery(t *testing.T) {
+	t.Skip("manual test")
 	localRepo, remoteRepo := InitRepos(t)
 	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)

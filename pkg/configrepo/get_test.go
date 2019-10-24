@@ -66,3 +66,23 @@ func TestConfigRepo_GetFile(t *testing.T) {
 		})
 	}
 }
+
+func TestConfigRepo_GetNearestBranch_AppNotFound(t *testing.T) {
+	localRepo, remoteRepo := InitRepos(t)
+	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	assert.NoError(t, err)
+	assert.NotNil(t, cfgRepo)
+	assert.NoError(t, cfgRepo.Init())
+	_, err = cfgRepo.GetNearestBranch("not-exist-app", "v1.0.0")
+	assert.Error(t, err)
+}
+
+func TestConfigRepo_GetFile_AppNotFound(t *testing.T) {
+	localRepo, remoteRepo := InitRepos(t)
+	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	assert.NoError(t, err)
+	assert.NotNil(t, cfgRepo)
+	assert.NoError(t, cfgRepo.Init())
+	_, err = cfgRepo.GetFile("not-exist-app", "v1.0.0", "config.yml")
+	assert.Error(t, err)
+}
