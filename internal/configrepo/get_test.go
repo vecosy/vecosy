@@ -3,14 +3,11 @@ package configrepo
 import (
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/src-d/go-git.v4"
-	"os"
 	"testing"
 )
 
 func TestConfigRepo_GetNearestBranch_FullMatch(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	defer os.RemoveAll(localRepo)
-	defer os.RemoveAll(remoteRepo)
 	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
@@ -23,8 +20,6 @@ func TestConfigRepo_GetNearestBranch_FullMatch(t *testing.T) {
 
 func TestConfigRepo_GetNearestBranch_Between(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	defer os.RemoveAll(localRepo)
-	defer os.RemoveAll(remoteRepo)
 	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
@@ -37,8 +32,6 @@ func TestConfigRepo_GetNearestBranch_Between(t *testing.T) {
 
 func TestConfigRepo_GetNearestBranch_Over(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	defer os.RemoveAll(localRepo)
-	defer os.RemoveAll(remoteRepo)
 	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
@@ -51,8 +44,6 @@ func TestConfigRepo_GetNearestBranch_Over(t *testing.T) {
 
 func TestConfigRepo_GetFile(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	defer os.RemoveAll(localRepo)
-	defer os.RemoveAll(remoteRepo)
 	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)

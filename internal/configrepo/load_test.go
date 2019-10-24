@@ -4,14 +4,11 @@ import (
 	"github.com/hashicorp/go-version"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/src-d/go-git.v4"
-	"os"
 	"testing"
 )
 
 func TestNewConfigRepo(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	defer os.RemoveAll(localRepo)
-	defer os.RemoveAll(remoteRepo)
 	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)

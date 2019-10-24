@@ -18,14 +18,17 @@ var editorSignature = &object.Signature{
 	When:  time.Now(),
 }
 
+var testBasicPath = fmt.Sprintf("%s/vconf", os.TempDir())
+
 func TestMain(m *testing.M) {
 	logrus.SetLevel(logrus.DebugLevel)
 	m.Run()
+	_ = os.RemoveAll(testBasicPath)
 }
 
 func InitRepos(t *testing.T) (string, string) {
-	localTmpRepo := fmt.Sprintf("%s/vconf/%s", os.TempDir(), uuid.New().String())
-	remoteTmpRepo := fmt.Sprintf("%s/vconf/%s", os.TempDir(), uuid.New().String())
+	localTmpRepo := fmt.Sprintf("%s/%s", testBasicPath, uuid.New().String())
+	remoteTmpRepo := fmt.Sprintf("%s/%s", testBasicPath, uuid.New().String())
 	assert.NoError(t, archiver.Unarchive("../../tests/singleConfigRepo.tgz", remoteTmpRepo))
 	return localTmpRepo, remoteTmpRepo + "/singleConfigRepo"
 }
