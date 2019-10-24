@@ -1,0 +1,27 @@
+package configrepo
+
+import (
+	"github.com/hashicorp/go-version"
+	"github.com/stretchr/testify/assert"
+	"gopkg.in/src-d/go-git.v4"
+	"os"
+	"testing"
+)
+
+func TestNewConfigRepo(t *testing.T) {
+	localRepo, remoteRepo := InitRepos(t)
+	defer os.RemoveAll(localRepo)
+	defer os.RemoveAll(remoteRepo)
+	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	assert.NoError(t, err)
+	assert.NotNil(t, cfgRepo)
+	assert.NoError(t, cfgRepo.Init())
+	assert.Contains(t, cfgRepo.Apps, "app1")
+	v100, err := version.NewVersion("v1.0.0")
+	v101, err := version.NewVersion("v1.0.1")
+	v600, err := version.NewVersion("v6.0.0")
+	assert.NoError(t, err)
+	assert.Equal(t, cfgRepo.Apps["app1"].Versions[0], v600)
+	assert.Equal(t, cfgRepo.Apps["app1"].Versions[1], v101)
+	assert.Equal(t, cfgRepo.Apps["app1"].Versions[2], v100)
+}
