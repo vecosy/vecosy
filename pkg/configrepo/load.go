@@ -2,8 +2,8 @@ package configrepo
 
 import (
 	"github.com/hashicorp/go-version"
+	"github.com/n3wtron/vconf/v2/internal/utils"
 	"github.com/sirupsen/logrus"
-	"github.com/vconf/v2/internal/utils"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/src-d/go-git.v4/plumbing/storer"
 	"regexp"

@@ -2,12 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/n3wtron/vconf/v2/internal/rest"
 	"github.com/sirupsen/logrus"
-	"github.com/vconf/v2/internal/rest"
-	"os"
 	"github.com/spf13/cobra"
-
-	homedir "github.com/mitchellh/go-homedir"
+	"os"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
