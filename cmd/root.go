@@ -3,11 +3,13 @@ package cmd
 import (
 	"fmt"
 	"github.com/n3wtron/vconf/v2/internal/rest"
+	"github.com/n3wtron/vconf/v2/pkg/configrepo/configGitRepo"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"os"
-	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
+	"gopkg.in/src-d/go-git.v4"
+	"path"
+	"path/filepath"
 )
 
 var cfgFile string
@@ -17,7 +19,28 @@ var rootCmd = &cobra.Command{
 	Use:   "vconf",
 	Short: "VConf",
 	Run: func(cmd *cobra.Command, args []string) {
-		rest.StartServer()
+		repoUrl := viper.GetString("repo.url")
+		if !path.IsAbs(repoUrl) {
+			repoUrl, _ = filepath.Abs(repoUrl)
+		}
+		cfgRepo, err := configGitRepo.NewConfigRepo(viper.GetString("repo.path"), &git.CloneOptions{URL: repoUrl})
+		if err != nil {
+			logrus.Fatalf("error initializing repo:%s", err)
+		}
+		err = cfgRepo.Init()
+		if err != nil {
+			logrus.Fatalf("error loading the config repo:%s", err)
+		}
+		err = cfgRepo.Pull()
+		if err != nil {
+			logrus.Fatalf("error pulling the repo:%s", err)
+		}
+
+		restSrv := rest.New(cfgRepo, ":8080")
+		err = restSrv.Start()
+		if err != nil {
+			logrus.Fatalf("error starting rest server:%s", err)
+		}
 	},
 }
 
@@ -35,6 +58,7 @@ func init() {
 
 func initLogger() {
 	if verboseFlag != nil && *verboseFlag {
+		logrus.SetReportCaller(true)
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 }
@@ -42,14 +66,9 @@ func initConfig() {
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
 	} else {
-		home, err := homedir.Dir()
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".cmd")
+		viper.AddConfigPath("./config")
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
 	}
 
 	viper.AutomaticEnv()

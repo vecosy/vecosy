@@ -24,7 +24,7 @@ func (cr *GitConfigRepo) addApp(branchRef *plumbing.Reference) error {
 		} else {
 			logrus.Debugf("appName:%s appVersion:%s", appName, appStrVersion)
 			if _, appFound := cr.Apps[appName]; !appFound {
-				cr.Apps[appName] = NewApp(appName)
+				cr.Apps[appName] = newApp(appName)
 			}
 			if _, alreadyPresent := cr.Apps[appName].Branches[appStrVersion]; !alreadyPresent {
 				cr.Apps[appName].Versions = append(cr.Apps[appName].Versions, appVersion)

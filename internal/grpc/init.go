@@ -14,16 +14,16 @@ type Server struct {
 	address string
 }
 
-func NewServer(repo configrepo.Repo) *Server {
-	return &Server{repo: repo}
+func New(repo configrepo.Repo, address string) *Server {
+	s := &Server{repo: repo, address: address}
+	s.server = grpc.NewServer()
+	RegisterConfigurationServer(s.server, s)
+	return s
 }
 
-func (s *Server) Start(address string) error {
-	s.server = grpc.NewServer()
-	s.address = address
-	RegisterConfigurationServer(s.server, s)
-	logrus.Infof("Starting grpc server on address %s", address)
-	listener, err := net.Listen("tcp4", address)
+func (s *Server) Start() error {
+	logrus.Infof("Starting grpc server on address %s", s.address)
+	listener, err := net.Listen("tcp4", s.address)
 	if err != nil {
 		logrus.Errorf("Error creating grpc listener: %s", err)
 		return err

@@ -1,0 +1,5 @@
+
+repo:
+  type: git
+  url: ./samples/git/
+  path: /tmp/vconfData

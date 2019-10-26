@@ -30,14 +30,14 @@ func TestServer_GetFile(t *testing.T) {
 	mockRepo := mocks.NewMockRepo(ctrl)
 	mockRepo.EXPECT().GetFile(appName, appVersion, fileName).Return(fileContent, nil)
 
-	srv := NewServer(mockRepo)
-
 	freePort, err := freeport.GetFreePort()
 	assert.NoError(t, err)
 	address := fmt.Sprintf("127.0.0.1:%d", freePort)
 
+	srv := New(mockRepo, address)
+
 	go func() {
-		err := srv.Start(address)
+		err := srv.Start()
 		if err != nil {
 			assert.FailNow(t, "error starting grpc server %s", err)
 		}

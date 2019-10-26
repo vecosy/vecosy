@@ -3,6 +3,7 @@ package configGitRepo
 import (
 	"fmt"
 	"github.com/hashicorp/go-version"
+	"github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"io/ioutil"
 )
@@ -25,24 +26,30 @@ func (cr *GitConfigRepo) GetNearestBranch(targetApp, targetVersion string) (*plu
 }
 
 func (cr *GitConfigRepo) GetFile(targetApp, targetVersion, path string) ([]byte, error) {
+	log := logrus.WithField("method", "GetFile").WithField("targetApp", targetApp).WithField("targetVersion", targetVersion).WithField("path", path)
 	branchRef, err := cr.GetNearestBranch(targetApp, targetVersion)
 	if err != nil {
 		return nil, err
 	}
 	commit, err := cr.repo.CommitObject(branchRef.Hash())
 	if err != nil {
+		log.Errorf("Error getting the commit object:%s", err)
 		return nil, err
 	}
+	log.Debugf("found commit: %s", commit.Hash.String())
 	tree, err := commit.Tree()
 	if err != nil {
+		log.Errorf("Error getting the tree:%s", err)
 		return nil, err
 	}
 	fl, err := tree.File(path)
 	if err != nil {
+		log.Errorf("Error getting the file:%s", err)
 		return nil, err
 	}
 	flReader, err := fl.Reader()
 	if err != nil {
+		log.Errorf("Error creating the file reader:%s", err)
 		return nil, err
 	}
 	defer flReader.Close()

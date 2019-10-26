@@ -14,7 +14,7 @@ type app struct {
 	Versions []*version.Version
 }
 
-func NewApp(name string) *app {
+func newApp(name string) *app {
 	return &app{name, make(map[string]*plumbing.Reference), make([]*version.Version, 0)}
 }
 
