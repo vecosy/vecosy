@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+service Configuration {
+    rpc GetFile(GetFileRequest) returns (GetFileResponse){}
+}
+
+message GetFileResponse{
+    bytes fileContent = 1;
+}
+
+message GetFileRequest{
+    string appName = 1;
+    string appVersion = 2;
+    string filePath = 3;
+}

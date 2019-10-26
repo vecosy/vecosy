@@ -1,4 +1,4 @@
-package configrepo
+package configGitRepo
 
 import (
 	"github.com/hashicorp/go-version"
@@ -13,12 +13,12 @@ func TestNewConfigRepo(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
-	assert.Contains(t, cfgRepo.Apps, "app1")
+	assert.Contains(t, cfgRepo.GetAppsVersions(), "app1")
 	v100, err := version.NewVersion("v1.0.0")
 	v101, err := version.NewVersion("v1.0.1")
 	v600, err := version.NewVersion("v6.0.0")
 	assert.NoError(t, err)
-	assert.Equal(t, cfgRepo.Apps["app1"].Versions[0], v600)
-	assert.Equal(t, cfgRepo.Apps["app1"].Versions[1], v101)
-	assert.Equal(t, cfgRepo.Apps["app1"].Versions[2], v100)
+	assert.Equal(t, cfgRepo.GetAppsVersions()["app1"][0], v600)
+	assert.Equal(t, cfgRepo.GetAppsVersions()["app1"][1], v101)
+	assert.Equal(t, cfgRepo.GetAppsVersions()["app1"][2], v100)
 }

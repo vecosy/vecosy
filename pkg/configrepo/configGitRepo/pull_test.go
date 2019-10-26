@@ -1,4 +1,4 @@
-package configrepo
+package configGitRepo
 
 import (
 	"fmt"

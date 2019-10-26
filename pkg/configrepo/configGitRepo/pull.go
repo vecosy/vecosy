@@ -1,4 +1,4 @@
-package configrepo
+package configGitRepo
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (cr *ConfigRepo) StartPullingEvery(period time.Duration) error {
+func (cr *GitConfigRepo) StartPullingEvery(period time.Duration) error {
 	t := time.NewTicker(period)
 	go func() {
 		for {
@@ -24,11 +24,11 @@ func (cr *ConfigRepo) StartPullingEvery(period time.Duration) error {
 	return nil
 }
 
-func (cr *ConfigRepo) StopPulling() {
+func (cr *GitConfigRepo) StopPulling() {
 	cr.pullCh <- true
 }
 
-func (cr *ConfigRepo) Pull() error {
+func (cr *GitConfigRepo) Pull() error {
 	logrus.Info("Pull")
 	if cr.cloneOpts != nil {
 		fetchOpts := &git.FetchOptions{Auth: cr.cloneOpts.Auth, Force: true, Tags: git.AllTags}
@@ -41,7 +41,7 @@ func (cr *ConfigRepo) Pull() error {
 				logrus.Info("already up to date")
 			}
 		}
-		return cr.LoadApps()
+		return cr.loadApps()
 	} else {
 		return fmt.Errorf("cannot pull:no remote information found")
 	}

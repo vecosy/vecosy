@@ -1,13 +1,13 @@
-package configrepo
+package configGitRepo
 
 import (
 	"fmt"
 	"github.com/hashicorp/go-version"
 	"gopkg.in/src-d/go-git.v4/plumbing"
-	"gopkg.in/src-d/go-git.v4/plumbing/object"
+	"io/ioutil"
 )
 
-func (cr *ConfigRepo) GetNearestBranch(targetApp, targetVersion string) (*plumbing.Reference, error) {
+func (cr *GitConfigRepo) GetNearestBranch(targetApp, targetVersion string) (*plumbing.Reference, error) {
 	app, appFound := cr.Apps[targetApp]
 	if !appFound {
 		return nil, fmt.Errorf("no app found with name %s", targetApp)
@@ -24,7 +24,7 @@ func (cr *ConfigRepo) GetNearestBranch(targetApp, targetVersion string) (*plumbi
 	return nil, fmt.Errorf("no branch found for target chkVer:%s", targetVersion)
 }
 
-func (cr *ConfigRepo) GetFile(targetApp, targetVersion, path string) (*object.File, error) {
+func (cr *GitConfigRepo) GetFile(targetApp, targetVersion, path string) ([]byte, error) {
 	branchRef, err := cr.GetNearestBranch(targetApp, targetVersion)
 	if err != nil {
 		return nil, err
@@ -37,5 +37,14 @@ func (cr *ConfigRepo) GetFile(targetApp, targetVersion, path string) (*object.Fi
 	if err != nil {
 		return nil, err
 	}
-	return tree.File(path)
+	fl, err := tree.File(path)
+	if err != nil {
+		return nil, err
+	}
+	flReader, err := fl.Reader()
+	if err != nil {
+		return nil, err
+	}
+	defer flReader.Close()
+	return ioutil.ReadAll(flReader)
 }

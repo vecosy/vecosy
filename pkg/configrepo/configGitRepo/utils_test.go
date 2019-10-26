@@ -1,32 +1,27 @@
-package configrepo
+package configGitRepo
 
 import (
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/n3wtron/vconf/v2/pkg/configrepo"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	"os"
 	"testing"
 )
 
-func getConfigYml(t *testing.T, cfgRepo *ConfigRepo, appName, targetVersion string) map[string]interface{} {
+func getConfigYml(t *testing.T, cfgRepo configrepo.Repo, appName, targetVersion string) map[string]interface{} {
 	cfgFl, err := cfgRepo.GetFile(appName, targetVersion, "config.yml")
 	assert.NoError(t, err)
-	flReader, err := cfgFl.Reader()
-	assert.NoError(t, err)
-	defer flReader.Close()
-	flCnt, err := ioutil.ReadAll(flReader)
-	assert.NoError(t, err)
 	configContent := make(map[string]interface{})
-	assert.NoError(t, yaml.Unmarshal(flCnt, configContent))
+	assert.NoError(t, yaml.Unmarshal(cfgFl, configContent))
 	return configContent
 }
 
-func editAndPush(t *testing.T, remoteRepo, app, srcVersion,dstVersion, fileName, commitMsg string, content []byte) {
+func editAndPush(t *testing.T, remoteRepo, app, srcVersion, dstVersion, fileName, commitMsg string, content []byte) {
 	editorRepoPath := fmt.Sprintf("%s/%s", testBasicPath, uuid.New().String())
 	t.Logf("editorPath:%s", editorRepoPath)
 	editorRepo, err := git.PlainClone(editorRepoPath, false, &git.CloneOptions{URL: remoteRepo, NoCheckout: true})
@@ -55,7 +50,7 @@ func editAndPush(t *testing.T, remoteRepo, app, srcVersion,dstVersion, fileName,
 	branchRef := plumbing.NewHashReference(localBranch, head.Hash())
 	assert.NoError(t, editorRepo.Storer.SetReference(branchRef))
 
-	reference := config.RefSpec(fmt.Sprintf("%s:%s",localBranch,localBranch))
+	reference := config.RefSpec(fmt.Sprintf("%s:%s", localBranch, localBranch))
 	assert.NoError(t, editorRepo.Push(&git.PushOptions{
 		RemoteName: "origin",
 		RefSpecs:   []config.RefSpec{reference},

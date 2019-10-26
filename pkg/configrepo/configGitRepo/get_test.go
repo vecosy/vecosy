@@ -1,4 +1,4 @@
-package configrepo
+package configGitRepo
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -12,7 +12,8 @@ func TestConfigRepo_GetNearestBranch_FullMatch(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
-	branch, err := cfgRepo.GetNearestBranch("app1", "v1.0.0")
+	gitRepo := cfgRepo.(*GitConfigRepo)
+	branch, err := gitRepo.GetNearestBranch("app1", "v1.0.0")
 	assert.NoError(t, err)
 	assert.NotNil(t, branch)
 	assert.Contains(t, branch.Name().String(), "app1/v1.0.0")
@@ -24,7 +25,8 @@ func TestConfigRepo_GetNearestBranch_Between(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
-	branch, err := cfgRepo.GetNearestBranch("app1", "v5.0.0")
+	gitRepo := cfgRepo.(*GitConfigRepo)
+	branch, err := gitRepo.GetNearestBranch("app1", "v5.0.0")
 	assert.NoError(t, err)
 	assert.NotNil(t, branch)
 	assert.Contains(t, branch.Name().String(), "refs/tags/app1/v1.0.1")
@@ -36,7 +38,8 @@ func TestConfigRepo_GetNearestBranch_Over(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
-	branch, err := cfgRepo.GetNearestBranch("app1", "v10.0.0")
+	gitRepo := cfgRepo.(*GitConfigRepo)
+	branch, err := gitRepo.GetNearestBranch("app1", "v10.0.0")
 	assert.NoError(t, err)
 	assert.NotNil(t, branch)
 	assert.Contains(t, branch.Name().String(), "app1/v6.0.0")
@@ -73,7 +76,8 @@ func TestConfigRepo_GetNearestBranch_AppNotFound(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
-	_, err = cfgRepo.GetNearestBranch("not-exist-app", "v1.0.0")
+	gitRepo := cfgRepo.(*GitConfigRepo)
+	_, err = gitRepo.GetNearestBranch("not-exist-app", "v1.0.0")
 	assert.Error(t, err)
 }
 

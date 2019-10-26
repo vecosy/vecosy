@@ -1,4 +1,4 @@
-package configrepo
+package configGitRepo
 
 import (
 	"fmt"
@@ -29,6 +29,6 @@ func TestMain(m *testing.M) {
 func InitRepos(t *testing.T) (string, string) {
 	localTmpRepo := fmt.Sprintf("%s/%s", testBasicPath, uuid.New().String())
 	remoteTmpRepo := fmt.Sprintf("%s/%s", testBasicPath, uuid.New().String())
-	assert.NoError(t, archiver.Unarchive("../../tests/singleConfigRepo.tgz", remoteTmpRepo))
+	assert.NoError(t, archiver.Unarchive("../../../tests/singleConfigRepo.tgz", remoteTmpRepo))
 	return localTmpRepo, remoteTmpRepo + "/singleConfigRepo"
 }

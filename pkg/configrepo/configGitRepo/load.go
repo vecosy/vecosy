@@ -1,4 +1,4 @@
-package configrepo
+package configGitRepo
 
 import (
 	"github.com/hashicorp/go-version"
@@ -11,7 +11,7 @@ import (
 )
 var appRe = regexp.MustCompile(".*/([a-z|A-Z|0-9|-|.]*)/([a-z|A-Z|0-9|-|.]*)")
 
-func (cr *ConfigRepo) addApp(branchRef *plumbing.Reference) error {
+func (cr *GitConfigRepo) addApp(branchRef *plumbing.Reference) error {
 	logrus.Debugf("analyzing reference :%s", branchRef.Name())
 	branchName := branchRef.Name().String()
 	appMatches := appRe.FindAllStringSubmatch(branchName, 1)
@@ -37,7 +37,7 @@ func (cr *ConfigRepo) addApp(branchRef *plumbing.Reference) error {
 	return nil
 }
 
-func (cr *ConfigRepo) LoadApps() error {
+func (cr *GitConfigRepo) loadApps() error {
 	err := cr.loadAppsFromRemoteBranches()
 	if err != nil {
 		logrus.Errorf("Error loading apps from remote branches:%s", err)
@@ -76,7 +76,7 @@ func remoteBranches(s storer.ReferenceStorer) (storer.ReferenceIter, error) {
 	}, refs), nil
 }
 
-func (cr *ConfigRepo) loadAppsFromRemoteBranches() error {
+func (cr *GitConfigRepo) loadAppsFromRemoteBranches() error {
 	branches, err := remoteBranches(cr.repo.Storer)
 	if err != nil {
 		return err
@@ -84,7 +84,7 @@ func (cr *ConfigRepo) loadAppsFromRemoteBranches() error {
 	return branches.ForEach(cr.addApp)
 }
 
-func (cr *ConfigRepo) loadAppsFromLocalBranches() error {
+func (cr *GitConfigRepo) loadAppsFromLocalBranches() error {
 	branches, err := cr.repo.Branches()
 	if err != nil {
 		return err
@@ -92,7 +92,7 @@ func (cr *ConfigRepo) loadAppsFromLocalBranches() error {
 	return branches.ForEach(cr.addApp)
 }
 
-func (cr *ConfigRepo) loadAppsFromTags() error {
+func (cr *GitConfigRepo) loadAppsFromTags() error {
 	tags, err := cr.repo.Tags()
 	if err != nil {
 		return err
