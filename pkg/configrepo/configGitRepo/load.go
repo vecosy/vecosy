@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"sort"
 )
-var appRe = regexp.MustCompile(".*/([a-z|A-Z|0-9|-|.]*)/([a-z|A-Z|0-9|-|.]*)")
+var appRe = regexp.MustCompile(".*/([a-z|A-Z|0-9|\\-|.]*)/([a-z|A-Z|0-9|\\-|.]*)")
 
 func (cr *GitConfigRepo) addApp(branchRef *plumbing.Reference) error {
 	logrus.Debugf("analyzing reference :%s", branchRef.Name())

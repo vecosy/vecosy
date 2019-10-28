@@ -13,6 +13,7 @@ require (
 	github.com/flosch/pongo2 v0.0.0-20190707114632-bbf5a6c351f4 // indirect
 	github.com/frankban/quicktest v1.5.0 // indirect
 	github.com/gavv/monotime v0.0.0-20190418164738-30dba4353424 // indirect
+	github.com/ghodss/yaml v1.0.0
 	github.com/golang/mock v1.3.1
 	github.com/golang/protobuf v1.3.2
 	github.com/golang/snappy v0.0.1 // indirect
@@ -35,7 +36,6 @@ require (
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mholt/archiver v3.1.1+incompatible
 	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
-	github.com/mitchellh/go-homedir v1.1.0
 	github.com/moul/http2curl v1.0.0 // indirect
 	github.com/nwaples/rardecode v1.0.0 // indirect
 	github.com/onsi/ginkgo v1.10.2 // indirect

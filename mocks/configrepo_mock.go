@@ -7,6 +7,7 @@ package mocks
 import (
 	gomock "github.com/golang/mock/gomock"
 	go_version "github.com/hashicorp/go-version"
+	configrepo "github.com/n3wtron/vconf/v2/pkg/configrepo"
 	reflect "reflect"
 	time "time"
 )
@@ -63,10 +64,10 @@ func (mr *MockRepoMockRecorder) GetAppsVersions() *gomock.Call {
 }
 
 // GetFile mocks base method
-func (m *MockRepo) GetFile(targetApp, targetVersion, path string) ([]byte, error) {
+func (m *MockRepo) GetFile(targetApp, targetVersion, path string) (*configrepo.RepoFile, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetFile", targetApp, targetVersion, path)
-	ret0, _ := ret[0].([]byte)
+	ret0, _ := ret[0].(*configrepo.RepoFile)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

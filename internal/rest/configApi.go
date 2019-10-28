@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 )
 
-func (s *Server) registerConfigApi(parent iris.Party) {
+func (s *Server) registerConfigEndpoints(parent iris.Party) {
 	configApi := parent.Party("/config")
 	configApi.Get("/", s.Info)
 	configApi.Get("/{appName:string}/", s.GetApp)
@@ -53,13 +53,13 @@ func (s *Server) GetFile(ctx iris.Context) {
 		badRequest(ctx, fmt.Sprintf("%s is not a valid version", appVersion))
 	}
 
-	fileContent, err := s.repo.GetFile(appName, appVersion, filePath)
+	file, err := s.repo.GetFile(appName, appVersion, filePath)
 	if err != nil {
 		log.Error(err)
 		internalServerError(ctx)
 	}
 	var mimeType string
-	fileKind, err := filetype.Match(fileContent)
+	fileKind, err := filetype.Match(file.Content)
 	if err == nil && fileKind != filetype.Unknown {
 		log.Debugf("Found fileType: %+v", fileKind)
 		mimeType = fileKind.MIME.Value
@@ -69,5 +69,5 @@ func (s *Server) GetFile(ctx iris.Context) {
 	}
 	log.Debugf("Detected fileType:%s", mimeType)
 	ctx.ContentType(mimeType)
-	_, _ = ctx.Write(fileContent)
+	_, _ = ctx.Write(file.Content)
 }

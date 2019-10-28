@@ -37,11 +37,11 @@ func (s *Server) Stop() {
 }
 
 func (s *Server) GetFile(ctx context.Context, request *GetFileRequest) (*GetFileResponse, error) {
-	flContent, err := s.repo.GetFile(request.AppName, request.AppVersion, request.FilePath)
+	file, err := s.repo.GetFile(request.AppName, request.AppVersion, request.FilePath)
 	if err != nil {
 		return nil, err
 	}
 	return &GetFileResponse{
-		FileContent: flContent,
+		FileContent: file.Content,
 	}, nil
 }

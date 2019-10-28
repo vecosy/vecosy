@@ -6,6 +6,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/n3wtron/vconf/v2/mocks"
+	"github.com/n3wtron/vconf/v2/pkg/configrepo"
 	"github.com/phayes/freeport"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -28,7 +29,10 @@ func TestServer_GetFile(t *testing.T) {
 	fileContent := []byte(uuid.New().String())
 
 	mockRepo := mocks.NewMockRepo(ctrl)
-	mockRepo.EXPECT().GetFile(appName, appVersion, fileName).Return(fileContent, nil)
+	mockRepo.EXPECT().GetFile(appName, appVersion, fileName).Return(&configrepo.RepoFile{
+		Version: uuid.New().String(),
+		Content: fileContent,
+	}, nil)
 
 	freePort, err := freeport.GetFreePort()
 	assert.NoError(t, err)

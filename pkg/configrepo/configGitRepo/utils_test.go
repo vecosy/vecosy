@@ -17,7 +17,7 @@ func getConfigYml(t *testing.T, cfgRepo configrepo.Repo, appName, targetVersion 
 	cfgFl, err := cfgRepo.GetFile(appName, targetVersion, "config.yml")
 	assert.NoError(t, err)
 	configContent := make(map[string]interface{})
-	assert.NoError(t, yaml.Unmarshal(cfgFl, configContent))
+	assert.NoError(t, yaml.Unmarshal(cfgFl.Content, configContent))
 	return configContent
 }
 

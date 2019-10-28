@@ -10,6 +10,7 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 	"path"
 	"path/filepath"
+	"time"
 )
 
 var cfgFile string
@@ -31,7 +32,7 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			logrus.Fatalf("error loading the config repo:%s", err)
 		}
-		err = cfgRepo.Pull()
+		err = cfgRepo.StartPullingEvery(30 * time.Second)
 		if err != nil {
 			logrus.Fatalf("error pulling the repo:%s", err)
 		}
@@ -60,6 +61,7 @@ func initLogger() {
 	if verboseFlag != nil && *verboseFlag {
 		logrus.SetReportCaller(true)
 		logrus.SetLevel(logrus.DebugLevel)
+		logrus.SetFormatter(&logrus.TextFormatter{ForceColors: true,})
 	}
 }
 func initConfig() {

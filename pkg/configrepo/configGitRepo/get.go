@@ -3,6 +3,7 @@ package configGitRepo
 import (
 	"fmt"
 	"github.com/hashicorp/go-version"
+	"github.com/n3wtron/vconf/v2/pkg/configrepo"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"io/ioutil"
@@ -25,7 +26,7 @@ func (cr *GitConfigRepo) GetNearestBranch(targetApp, targetVersion string) (*plu
 	return nil, fmt.Errorf("no branch found for target chkVer:%s", targetVersion)
 }
 
-func (cr *GitConfigRepo) GetFile(targetApp, targetVersion, path string) ([]byte, error) {
+func (cr *GitConfigRepo) GetFile(targetApp, targetVersion, path string) (*configrepo.RepoFile, error) {
 	log := logrus.WithField("method", "GetFile").WithField("targetApp", targetApp).WithField("targetVersion", targetVersion).WithField("path", path)
 	branchRef, err := cr.GetNearestBranch(targetApp, targetVersion)
 	if err != nil {
@@ -42,6 +43,7 @@ func (cr *GitConfigRepo) GetFile(targetApp, targetVersion, path string) ([]byte,
 		log.Errorf("Error getting the tree:%s", err)
 		return nil, err
 	}
+
 	fl, err := tree.File(path)
 	if err != nil {
 		log.Errorf("Error getting the file:%s", err)
@@ -53,5 +55,11 @@ func (cr *GitConfigRepo) GetFile(targetApp, targetVersion, path string) ([]byte,
 		return nil, err
 	}
 	defer flReader.Close()
-	return ioutil.ReadAll(flReader)
+	result := &configrepo.RepoFile{Version: commit.Hash.String()}
+	result.Content, err = ioutil.ReadAll(flReader)
+	if err != nil {
+		log.Errorf("Error reading the file:%s", err)
+		return nil, err
+	}
+	return result, nil
 }
