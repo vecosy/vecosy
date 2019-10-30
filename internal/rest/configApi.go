@@ -5,6 +5,7 @@ import (
 	"github.com/h2non/filetype"
 	"github.com/hashicorp/go-version"
 	"github.com/kataras/iris"
+	"github.com/n3wtron/vconf/v2/pkg/configrepo"
 	"github.com/sirupsen/logrus"
 	"mime"
 	"path/filepath"
@@ -55,8 +56,13 @@ func (s *Server) GetFile(ctx iris.Context) {
 
 	file, err := s.repo.GetFile(appName, appVersion, filePath)
 	if err != nil {
-		log.Error(err)
-		internalServerError(ctx)
+		log.Errorf("error getting file err:%s", err)
+		if err == configrepo.FileNotFoundError {
+			notFoundResponse(ctx)
+		} else {
+			internalServerError(ctx)
+		}
+		return
 	}
 	var mimeType string
 	fileKind, err := filetype.Match(file.Content)
