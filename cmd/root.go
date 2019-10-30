@@ -69,7 +69,7 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		viper.AddConfigPath("./config")
-		viper.SetConfigName("config")
+		viper.SetConfigName("vconf")
 		viper.SetConfigType("yaml")
 	}
 
