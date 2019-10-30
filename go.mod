@@ -22,6 +22,7 @@ require (
 	github.com/gorilla/schema v1.1.0 // indirect
 	github.com/h2non/filetype v1.0.10
 	github.com/hashicorp/go-version v1.2.0
+	github.com/imdario/mergo v0.3.8
 	github.com/imkira/go-interpol v1.1.0 // indirect
 	github.com/iris-contrib/blackfriday v2.0.0+incompatible // indirect
 	github.com/iris-contrib/formBinder v5.0.0+incompatible // indirect

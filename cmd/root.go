@@ -32,7 +32,7 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			logrus.Fatalf("error loading the config repo:%s", err)
 		}
-		err = cfgRepo.StartPullingEvery(30 * time.Second)
+		err = cfgRepo.StartPullingEvery(5 * time.Second)
 		if err != nil {
 			logrus.Fatalf("error pulling the repo:%s", err)
 		}

@@ -1,7 +1,6 @@
 package vconf
 
 import (
-	"context"
 	"github.com/n3wtron/vconf/v2/pkg/configrepo"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -36,12 +35,4 @@ func (s *Server) Stop() {
 	s.server.Stop()
 }
 
-func (s *Server) GetFile(ctx context.Context, request *GetFileRequest) (*GetFileResponse, error) {
-	file, err := s.repo.GetFile(request.AppName, request.AppVersion, request.FilePath)
-	if err != nil {
-		return nil, err
-	}
-	return &GetFileResponse{
-		FileContent: file.Content,
-	}, nil
-}
+
