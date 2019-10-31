@@ -5,7 +5,7 @@ import (
 	"github.com/imdario/mergo"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/core/router"
-	"github.com/n3wtron/vconf/v2/internal/utils"
+	"github.com/vecosy/vecosy/v2/internal/utils"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 	"path"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/middleware/logger"
-	"github.com/n3wtron/vconf/v2/pkg/configrepo"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"github.com/sirupsen/logrus"
 	"mime"
 )

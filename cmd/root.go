@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/n3wtron/vconf/v2/internal/rest"
-	"github.com/n3wtron/vconf/v2/pkg/configrepo/configGitRepo"
+	"github.com/vecosy/vecosy/v2/internal/rest"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo/configGitRepo"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

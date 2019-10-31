@@ -5,7 +5,7 @@ import (
 	"github.com/h2non/filetype"
 	"github.com/hashicorp/go-version"
 	"github.com/kataras/iris"
-	"github.com/n3wtron/vconf/v2/pkg/configrepo"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"github.com/sirupsen/logrus"
 	"mime"
 	"path/filepath"

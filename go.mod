@@ -1,4 +1,4 @@
-module github.com/n3wtron/vconf/v2
+module github.com/vecosy/vecosy/v2
 
 go 1.13
 

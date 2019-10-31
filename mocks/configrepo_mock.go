@@ -7,7 +7,7 @@ package mocks
 import (
 	gomock "github.com/golang/mock/gomock"
 	go_version "github.com/hashicorp/go-version"
-	configrepo "github.com/n3wtron/vconf/v2/pkg/configrepo"
+	configrepo "github.com/vecosy/vecosy/v2/pkg/configrepo"
 	reflect "reflect"
 	time "time"
 )

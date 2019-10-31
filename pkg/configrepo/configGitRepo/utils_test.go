@@ -3,7 +3,7 @@ package configGitRepo
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/n3wtron/vconf/v2/pkg/configrepo"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"

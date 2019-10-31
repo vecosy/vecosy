@@ -2,7 +2,7 @@ package configGitRepo
 
 import (
 	"github.com/hashicorp/go-version"
-	"github.com/n3wtron/vconf/v2/pkg/configrepo"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"

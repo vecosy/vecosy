@@ -1,7 +1,7 @@
 package vconf
 
 import (
-	"github.com/n3wtron/vconf/v2/pkg/configrepo"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"net"
