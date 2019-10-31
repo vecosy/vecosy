@@ -1,5 +1,5 @@
 # Product Versioned Configuration System
-**vconf** is a centralized system based on the application version.
+**vecosy** is a centralized system based on the application version.
 
 
 ## Features
