@@ -1,0 +1,6 @@
+repo:
+  remote:
+    url: file://./samples/git
+    pullEvery: 30s
+  local:
+    path: /tmp/vecosyData
