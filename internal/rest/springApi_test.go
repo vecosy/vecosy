@@ -6,10 +6,10 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/kataras/iris/httptest"
-	"github.com/vecosy/vecosy/v2/mocks"
-	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/vecosy/vecosy/v2/mocks"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"strings"
 	"testing"
 )
@@ -64,6 +64,8 @@ func TestServer_Get_OnlyProfile(t *testing.T) {
 	assert.NoError(t, err)
 
 	repo.EXPECT().GetFile(appName, appVersion, "app1.yml").Times(3).Return(nil, fmt.Errorf("not found"))
+	repo.EXPECT().GetFile(appName, appVersion, "application.yml").Times(3).Return(nil, fmt.Errorf("not found"))
+	repo.EXPECT().GetFile(appName, appVersion, "application-dev.yml").Times(3).Return(nil, fmt.Errorf("not found"))
 	repo.EXPECT().GetFile(appName, appVersion, "app1-dev.yml").Times(3).Return(&configrepo.RepoFile{
 		Version: commitVersion,
 		Content: ymlContent,
@@ -121,6 +123,7 @@ func TestServer_Get_ProfileAndCommon(t *testing.T) {
 	app1DevContentPop1 := uuid.New().String()
 	app1CommonContentCommonProp := uuid.New().String()
 	app1CommonContentSubProp2 := uuid.New().String()
+
 	app1DevContent := map[string]interface{}{"prop1": app1DevContentPop1, "common": map[string]interface{}{"subProp": app1DevContentCommonSubProp}}
 	app1IntContent := map[string]interface{}{"intProp": uuid.New().String(), "common": map[string]interface{}{"subProp": app1DevContentCommonSubProp}}
 	app1CommonContent := map[string]interface{}{"commonProp": app1CommonContentCommonProp, "common": map[string]interface{}{"subProp": uuid.New().String(), "subProp2": app1CommonContentSubProp2}}
@@ -132,7 +135,17 @@ func TestServer_Get_ProfileAndCommon(t *testing.T) {
 	app1IntYmlContent, err := yaml.Marshal(app1IntContent)
 	assert.NoError(t, err)
 
+	repo.EXPECT().GetFile(appName, appVersion, "application.yml").Times(4).Return(&configrepo.RepoFile{
+		Version: commitVersion,
+		Content: app1CommonYmlContent,
+	}, nil)
+
 	repo.EXPECT().GetFile(appName, appVersion, "app1.yml").Times(4).Return(&configrepo.RepoFile{
+		Version: commitVersion,
+		Content: app1CommonYmlContent,
+	}, nil)
+
+	repo.EXPECT().GetFile(appName, appVersion, "application-dev.yml").Times(4).Return(&configrepo.RepoFile{
 		Version: commitVersion,
 		Content: app1CommonYmlContent,
 	}, nil)
@@ -140,6 +153,11 @@ func TestServer_Get_ProfileAndCommon(t *testing.T) {
 	repo.EXPECT().GetFile(appName, appVersion, "app1-dev.yml").Times(4).Return(&configrepo.RepoFile{
 		Version: commitVersion,
 		Content: app1DevYmlContent,
+	}, nil)
+
+	repo.EXPECT().GetFile(appName, appVersion, "application-int.yml").Times(4).Return(&configrepo.RepoFile{
+		Version: commitVersion,
+		Content: app1CommonYmlContent,
 	}, nil)
 
 	repo.EXPECT().GetFile(appName, appVersion, "app1-int.yml").Return(&configrepo.RepoFile{
@@ -176,7 +194,12 @@ func TestServer_Get_ProfileAndCommon(t *testing.T) {
 	t.Run("getSpringFileByAppAndProfile_MultiProfile", func(t *testing.T) {
 		expectedPropertySources := []*propertySources{
 			{
-				Name:    "app1.yml",
+				Name:    "app1-int.yml",
+				Source:  app1IntContent,
+				version: commitVersion,
+			},
+			{
+				Name:    "application-int.yml",
 				Source:  app1CommonContent,
 				version: commitVersion,
 			},
@@ -184,9 +207,20 @@ func TestServer_Get_ProfileAndCommon(t *testing.T) {
 				Name:    "app1-dev.yml",
 				Source:  app1DevContent,
 				version: commitVersion,
-			}, {
-				Name:    "app1-int.yml",
-				Source:  app1IntContent,
+			},
+			{
+				Name:    "application-dev.yml",
+				Source:  app1CommonContent,
+				version: commitVersion,
+			},
+			{
+				Name:    "app1.yml",
+				Source:  app1CommonContent,
+				version: commitVersion,
+			},
+			{
+				Name:    "application.yml",
+				Source:  app1CommonContent,
 				version: commitVersion,
 			},
 		}

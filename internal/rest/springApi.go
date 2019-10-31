@@ -5,8 +5,8 @@ import (
 	"github.com/imdario/mergo"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/core/router"
-	"github.com/vecosy/vecosy/v2/internal/utils"
 	"github.com/sirupsen/logrus"
+	"github.com/vecosy/vecosy/v2/internal/utils"
 	"gopkg.in/yaml.v2"
 	"path"
 	"regexp"
@@ -50,7 +50,7 @@ func (s *Server) springAppInfo(ctx iris.Context) {
 		PropertySources: make([]*propertySources, 0),
 	}
 
-	for _, configFilePath := range s.getApplicationFilePaths(appName, profiles) {
+	for _, configFilePath := range s.getApplicationFilePaths(appName, profiles, false) {
 		propertySrc, err := s.getPropertySource(appName, appVersion, configFilePath)
 		if err != nil {
 			log.Errorf("Error getting resource:%s", err)
@@ -87,7 +87,7 @@ func (s *Server) springAppFile(ctx iris.Context) {
 
 	// reading and merging configurations
 	finalConfig := make(map[interface{}]interface{})
-	for _, configFilePath := range s.getApplicationFilePaths(appName, []string{profile}) {
+	for _, configFilePath := range s.getApplicationFilePaths(appName, []string{profile}, true) {
 		profileFile, err := s.repo.GetFile(appName, appVersion, configFilePath)
 		if err != nil {
 			logrus.Warnf("Error getting file:%s, err:%s", configFilePath, err)
@@ -176,13 +176,18 @@ func extractAppNameAndVersion(appAndProfile string) (string, string, string) {
 }
 
 // Given an application name and a profile list, returns the related application file names
-func (s *Server) getApplicationFilePaths(appName string, profiles []string) []string {
+func (s *Server) getApplicationFilePaths(appName string, profiles []string, commonFirst bool) []string {
 	appConfigFiles := make([]string, 0)
+	appConfigFiles = append(appConfigFiles, getSpringCommonApplicationFile("application"))
 	appConfigFiles = append(appConfigFiles, getSpringCommonApplicationFile(appName))
 	for _, profile := range profiles {
 		if profile != "" {
+			appConfigFiles = append(appConfigFiles, getSpringApplicationFile("application", profile))
 			appConfigFiles = append(appConfigFiles, getSpringApplicationFile(appName, profile))
 		}
+	}
+	if !commonFirst {
+		utils.ReverseStrings(appConfigFiles)
 	}
 	return appConfigFiles
 }
