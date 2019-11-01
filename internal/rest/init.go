@@ -41,16 +41,16 @@ func (s *Server) Stop() {
 
 func (s *Server) initV1Api() {
 	v1Api := s.app.Party("/v1")
-	s.registerFileEndpoints(v1Api)
+	s.registerRawEndpoints(v1Api)
+	s.registerSmartConfigEndpoints(v1Api)
 	s.registerSpringCloudEndpoints(v1Api)
 }
 
-
-func init(){
+func init() {
 	initExtraMimeTypes()
 }
 
 func initExtraMimeTypes() {
-	mime.AddExtensionType(".yml","application/x-yaml")
-	mime.AddExtensionType(".yaml","application/x-yaml")
+	mime.AddExtensionType(".yml", "application/x-yaml")
+	mime.AddExtensionType(".yaml", "application/x-yaml")
 }

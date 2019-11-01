@@ -1,11 +1,10 @@
 package rest
 
 import (
-	"fmt"
-	"github.com/imdario/mergo"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/core/router"
 	"github.com/sirupsen/logrus"
+	"github.com/vecosy/vecosy/v2/internal/merger"
 	"github.com/vecosy/vecosy/v2/internal/utils"
 	"gopkg.in/yaml.v2"
 	"path"
@@ -27,6 +26,8 @@ type springSummaryResponse struct {
 	State           *string            `json:"state"`
 	PropertySources []*propertySources `json:"propertySources"`
 }
+
+var springFileMerger = merger.SpringMerger{}
 
 func (s *Server) registerSpringCloudEndpoints(parent router.Party) {
 	springParty := parent.Party("/spring")
@@ -50,7 +51,7 @@ func (s *Server) springAppInfo(ctx iris.Context) {
 		PropertySources: make([]*propertySources, 0),
 	}
 
-	for _, configFilePath := range s.getApplicationFilePaths(appName, profiles, false) {
+	for _, configFilePath := range merger.GetSpringApplicationFilePaths(appName, profiles, false) {
 		propertySrc, err := s.getPropertySource(appName, appVersion, configFilePath)
 		if err != nil {
 			log.Errorf("Error getting resource:%s", err)
@@ -85,43 +86,13 @@ func (s *Server) springAppFile(ctx iris.Context) {
 		return
 	}
 
-	// reading and merging configurations
-	finalConfig := make(map[interface{}]interface{})
-	for _, configFilePath := range s.getApplicationFilePaths(appName, []string{profile}, true) {
-		profileFile, err := s.repo.GetFile(appName, appVersion, configFilePath)
-		if err != nil {
-			logrus.Warnf("Error getting file:%s, err:%s", configFilePath, err)
-		} else {
-			fileConfig := make(map[interface{}]interface{})
-			err = yaml.Unmarshal(profileFile.Content, fileConfig)
-			if err != nil {
-				logrus.Errorf("Error parsing yml file:%s, err:%s", configFilePath, err)
-			}
-			err = mergo.Map(&finalConfig, fileConfig, mergo.WithOverride)
-			if err != nil {
-				logrus.Errorf("Error merging configuration :%#+v, err:%s", fileConfig, err)
-			}
-		}
-	}
-
-	// converting and responding
-	var err error
-	switch ext {
-	case ".yml", ".yaml":
-		_, err = ctx.YAML(finalConfig)
-	case ".json":
-		normalizedMap, err := utils.NormalizeMap(finalConfig)
-		if err != nil {
-			logrus.Errorf("Error normalizing json map:%#+vs, err:%s", finalConfig, err)
-			internalServerError(ctx)
-			return
-		}
-		_, err = ctx.JSON(normalizedMap)
-	}
+	finalConfig, err := springFileMerger.Merge(s.repo, appName, appVersion, []string{profile})
 	if err != nil {
-		log.Errorf("Error responding :%s", err)
+		log.Errorf("error merging the configuration:%s", err)
 		internalServerError(ctx)
+		return
 	}
+	respondConfig(ctx, finalConfig, ext, log)
 }
 
 // Read a config file and convert it to propertySources
@@ -173,29 +144,4 @@ func extractAppNameAndVersion(appAndProfile string) (string, string, string) {
 		appName := strings.Replace(appAndProfile, ext, "", 1)
 		return appName, ext, ""
 	}
-}
-
-// Given an application name and a profile list, returns the related application file names
-func (s *Server) getApplicationFilePaths(appName string, profiles []string, commonFirst bool) []string {
-	appConfigFiles := make([]string, 0)
-	appConfigFiles = append(appConfigFiles, getSpringCommonApplicationFile("application"))
-	appConfigFiles = append(appConfigFiles, getSpringCommonApplicationFile(appName))
-	for _, profile := range profiles {
-		if profile != "" {
-			appConfigFiles = append(appConfigFiles, getSpringApplicationFile("application", profile))
-			appConfigFiles = append(appConfigFiles, getSpringApplicationFile(appName, profile))
-		}
-	}
-	if !commonFirst {
-		utils.ReverseStrings(appConfigFiles)
-	}
-	return appConfigFiles
-}
-
-func getSpringApplicationFile(appName, profile string) string {
-	return fmt.Sprintf("%s-%s.yml", appName, profile)
-}
-
-func getSpringCommonApplicationFile(appName string) string {
-	return fmt.Sprintf("%s.yml", appName)
 }

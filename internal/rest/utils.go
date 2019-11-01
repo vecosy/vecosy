@@ -3,6 +3,7 @@ package rest
 import (
 	"github.com/kataras/iris"
 	"net/http"
+	"strings"
 )
 
 func internalServerError(ctx iris.Context) {
@@ -33,4 +34,12 @@ func forbiddenResponse(ctx iris.Context) {
 
 func noContentResponse(ctx iris.Context) {
 	ctx.StatusCode(http.StatusNoContent)
+}
+
+func getAccepts(ctx iris.Context) map[string]bool {
+	result := make(map[string]bool)
+	for _, accept := range strings.Split(ctx.GetHeader("Accept"), ",") {
+		result[accept] = true
+	}
+	return result
 }

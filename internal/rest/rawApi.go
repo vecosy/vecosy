@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 )
 
-func (s *Server) registerFileEndpoints(parent iris.Party) {
+func (s *Server) registerRawEndpoints(parent iris.Party) {
 	configApi := parent.Party("/raw")
 	configApi.Get("/", s.Info)
 	configApi.Get("/{appName:string}/", s.GetApp)
