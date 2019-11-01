@@ -168,13 +168,23 @@ func TestServer_Get_ProfileAndCommon(t *testing.T) {
 	t.Run("getSpringFileByAppAndProfile_SingleProfile", func(t *testing.T) {
 		expectedPropertySources := []*propertySources{
 			{
+				Name:    "app1-dev.yml",
+				Source:  app1DevContent,
+				version: commitVersion,
+			},
+			{
+				Name:    "application-dev.yml",
+				Source:  app1CommonContent,
+				version: commitVersion,
+			},
+			{
 				Name:    "app1.yml",
 				Source:  app1CommonContent,
 				version: commitVersion,
 			},
 			{
-				Name:    "app1-dev.yml",
-				Source:  app1DevContent,
+				Name:    "application.yml",
+				Source:  app1CommonContent,
 				version: commitVersion,
 			},
 		}

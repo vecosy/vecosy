@@ -46,7 +46,7 @@ repo:
 ```
 ### Run
 ```shell script
-./vconf
+./vecosy
 ```
 ## Call the endpoint
 ### REST API

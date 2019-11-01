@@ -1,6 +1,6 @@
 repo:
   remote:
-    url: file://./samples/git
+    url: https://github.com/vecosy/config-sample.git
     pullEvery: 30s
   local:
     path: /tmp/vecosyData

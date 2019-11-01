@@ -28,7 +28,7 @@ func TestServer_GetFile(t *testing.T) {
 
 	t.Run("valid config", func(t *testing.T) {
 		filePath := "config.yml"
-		req := ht.GET("/v1/config/{appName}/{appVersion}/{filePath}")
+		req := ht.GET("/v1/raw/{appName}/{appVersion}/{filePath}")
 		req = req.WithPath("appName", appName)
 		req = req.WithPath("appVersion", appVersion)
 		fileReq := req.WithPath("filePath", filePath)
@@ -48,7 +48,7 @@ func TestServer_GetFile(t *testing.T) {
 
 	t.Run("not found", func(t *testing.T) {
 		filePath := "notExistFile"
-		req := ht.GET("/v1/config/{appName}/{appVersion}/{filePath}")
+		req := ht.GET("/v1/raw/{appName}/{appVersion}/{filePath}")
 		req = req.WithPath("appName", appName)
 		req = req.WithPath("appVersion", appVersion)
 		fileReq := req.WithPath("filePath", filePath)

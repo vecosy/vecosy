@@ -41,7 +41,7 @@ func (s *Server) Stop() {
 
 func (s *Server) initV1Api() {
 	v1Api := s.app.Party("/v1")
-	s.registerConfigEndpoints(v1Api)
+	s.registerFileEndpoints(v1Api)
 	s.registerSpringCloudEndpoints(v1Api)
 }
 
