@@ -11,3 +11,4 @@ func (s *Server) GetFile(ctx context.Context, request *GetFileRequest) (*GetFile
 		FileContent: file.Content,
 	}, nil
 }
+

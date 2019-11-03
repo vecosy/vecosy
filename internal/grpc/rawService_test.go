@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
-	"github.com/vecosy/vecosy/v2/mocks"
-	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"github.com/phayes/freeport"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/vecosy/vecosy/v2/mocks"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"google.golang.org/grpc"
 	"testing"
+	"time"
 )
 
 func TestMain(m *testing.M) {
@@ -22,34 +23,21 @@ func TestMain(m *testing.M) {
 func TestServer_GetFile(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
+	mockRepo, srv := initGrpc(ctrl, t)
 
 	appName := "app1"
 	appVersion := "1.0.0"
 	fileName := "config.yaml"
 	fileContent := []byte(uuid.New().String())
 
-	mockRepo := mocks.NewMockRepo(ctrl)
 	mockRepo.EXPECT().GetFile(appName, appVersion, fileName).Return(&configrepo.RepoFile{
 		Version: uuid.New().String(),
 		Content: fileContent,
 	}, nil)
-
-	freePort, err := freeport.GetFreePort()
+	conn, err := grpc.Dial(srv.address, grpc.WithInsecure())
 	assert.NoError(t, err)
-	address := fmt.Sprintf("127.0.0.1:%d", freePort)
-
-	srv := New(mockRepo, address)
-
-	go func() {
-		err := srv.Start()
-		if err != nil {
-			assert.FailNow(t, "error starting grpc server %s", err)
-		}
-	}()
-	defer srv.Stop()
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
-	assert.NoError(t, err)
-	cl := NewConfigurationClient(conn)
+	defer conn.Close()
+	cl := NewRawClient(conn)
 	req := &GetFileRequest{
 		AppName:    appName,
 		AppVersion: appVersion,
@@ -58,4 +46,21 @@ func TestServer_GetFile(t *testing.T) {
 	resp, err := cl.GetFile(context.TODO(), req)
 	assert.NoError(t, err)
 	assert.Equal(t, resp.FileContent, fileContent)
+	srv.Stop()
+}
+
+func initGrpc(ctrl *gomock.Controller, t *testing.T) (*mocks.MockRepo, *Server) {
+	mockRepo := mocks.NewMockRepo(ctrl)
+	freePort, err := freeport.GetFreePort()
+	assert.NoError(t, err)
+	address := fmt.Sprintf("127.0.0.1:%d", freePort)
+	srv := New(mockRepo, address)
+	go func() {
+		err := srv.Start()
+		if err != nil {
+			assert.FailNow(t, "error starting grpc server %s", err)
+		}
+	}()
+	time.Sleep(1 * time.Second)
+	return mockRepo, srv
 }

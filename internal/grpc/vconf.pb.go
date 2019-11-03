@@ -24,6 +24,100 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+type GetConfigRequest struct {
+	AppName              string   `protobuf:"bytes,1,opt,name=appName,proto3" json:"appName,omitempty"`
+	AppVersion           string   `protobuf:"bytes,2,opt,name=appVersion,proto3" json:"appVersion,omitempty"`
+	Environment          string   `protobuf:"bytes,3,opt,name=environment,proto3" json:"environment,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetConfigRequest) Reset()         { *m = GetConfigRequest{} }
+func (m *GetConfigRequest) String() string { return proto.CompactTextString(m) }
+func (*GetConfigRequest) ProtoMessage()    {}
+func (*GetConfigRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bda77b776bdcc01c, []int{0}
+}
+
+func (m *GetConfigRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetConfigRequest.Unmarshal(m, b)
+}
+func (m *GetConfigRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetConfigRequest.Marshal(b, m, deterministic)
+}
+func (m *GetConfigRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetConfigRequest.Merge(m, src)
+}
+func (m *GetConfigRequest) XXX_Size() int {
+	return xxx_messageInfo_GetConfigRequest.Size(m)
+}
+func (m *GetConfigRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetConfigRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetConfigRequest proto.InternalMessageInfo
+
+func (m *GetConfigRequest) GetAppName() string {
+	if m != nil {
+		return m.AppName
+	}
+	return ""
+}
+
+func (m *GetConfigRequest) GetAppVersion() string {
+	if m != nil {
+		return m.AppVersion
+	}
+	return ""
+}
+
+func (m *GetConfigRequest) GetEnvironment() string {
+	if m != nil {
+		return m.Environment
+	}
+	return ""
+}
+
+type GetConfigResponse struct {
+	ConfigContent        string   `protobuf:"bytes,1,opt,name=configContent,proto3" json:"configContent,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetConfigResponse) Reset()         { *m = GetConfigResponse{} }
+func (m *GetConfigResponse) String() string { return proto.CompactTextString(m) }
+func (*GetConfigResponse) ProtoMessage()    {}
+func (*GetConfigResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bda77b776bdcc01c, []int{1}
+}
+
+func (m *GetConfigResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetConfigResponse.Unmarshal(m, b)
+}
+func (m *GetConfigResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetConfigResponse.Marshal(b, m, deterministic)
+}
+func (m *GetConfigResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetConfigResponse.Merge(m, src)
+}
+func (m *GetConfigResponse) XXX_Size() int {
+	return xxx_messageInfo_GetConfigResponse.Size(m)
+}
+func (m *GetConfigResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetConfigResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetConfigResponse proto.InternalMessageInfo
+
+func (m *GetConfigResponse) GetConfigContent() string {
+	if m != nil {
+		return m.ConfigContent
+	}
+	return ""
+}
+
 type GetFileResponse struct {
 	FileContent          []byte   `protobuf:"bytes,1,opt,name=fileContent,proto3" json:"fileContent,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -35,7 +129,7 @@ func (m *GetFileResponse) Reset()         { *m = GetFileResponse{} }
 func (m *GetFileResponse) String() string { return proto.CompactTextString(m) }
 func (*GetFileResponse) ProtoMessage()    {}
 func (*GetFileResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bda77b776bdcc01c, []int{0}
+	return fileDescriptor_bda77b776bdcc01c, []int{2}
 }
 
 func (m *GetFileResponse) XXX_Unmarshal(b []byte) error {
@@ -76,7 +170,7 @@ func (m *GetFileRequest) Reset()         { *m = GetFileRequest{} }
 func (m *GetFileRequest) String() string { return proto.CompactTextString(m) }
 func (*GetFileRequest) ProtoMessage()    {}
 func (*GetFileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_bda77b776bdcc01c, []int{1}
+	return fileDescriptor_bda77b776bdcc01c, []int{3}
 }
 
 func (m *GetFileRequest) XXX_Unmarshal(b []byte) error {
@@ -118,27 +212,175 @@ func (m *GetFileRequest) GetFilePath() string {
 	return ""
 }
 
+type Application struct {
+	AppName              string   `protobuf:"bytes,1,opt,name=appName,proto3" json:"appName,omitempty"`
+	AppVersion           string   `protobuf:"bytes,2,opt,name=appVersion,proto3" json:"appVersion,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Application) Reset()         { *m = Application{} }
+func (m *Application) String() string { return proto.CompactTextString(m) }
+func (*Application) ProtoMessage()    {}
+func (*Application) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bda77b776bdcc01c, []int{4}
+}
+
+func (m *Application) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Application.Unmarshal(m, b)
+}
+func (m *Application) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Application.Marshal(b, m, deterministic)
+}
+func (m *Application) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Application.Merge(m, src)
+}
+func (m *Application) XXX_Size() int {
+	return xxx_messageInfo_Application.Size(m)
+}
+func (m *Application) XXX_DiscardUnknown() {
+	xxx_messageInfo_Application.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Application proto.InternalMessageInfo
+
+func (m *Application) GetAppName() string {
+	if m != nil {
+		return m.AppName
+	}
+	return ""
+}
+
+func (m *Application) GetAppVersion() string {
+	if m != nil {
+		return m.AppVersion
+	}
+	return ""
+}
+
+type WatchRequest struct {
+	WatcherName          string       `protobuf:"bytes,1,opt,name=watcherName,proto3" json:"watcherName,omitempty"`
+	Application          *Application `protobuf:"bytes,2,opt,name=application,proto3" json:"application,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
+}
+
+func (m *WatchRequest) Reset()         { *m = WatchRequest{} }
+func (m *WatchRequest) String() string { return proto.CompactTextString(m) }
+func (*WatchRequest) ProtoMessage()    {}
+func (*WatchRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bda77b776bdcc01c, []int{5}
+}
+
+func (m *WatchRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_WatchRequest.Unmarshal(m, b)
+}
+func (m *WatchRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_WatchRequest.Marshal(b, m, deterministic)
+}
+func (m *WatchRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WatchRequest.Merge(m, src)
+}
+func (m *WatchRequest) XXX_Size() int {
+	return xxx_messageInfo_WatchRequest.Size(m)
+}
+func (m *WatchRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_WatchRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WatchRequest proto.InternalMessageInfo
+
+func (m *WatchRequest) GetWatcherName() string {
+	if m != nil {
+		return m.WatcherName
+	}
+	return ""
+}
+
+func (m *WatchRequest) GetApplication() *Application {
+	if m != nil {
+		return m.Application
+	}
+	return nil
+}
+
+type WatchResponse struct {
+	Changed              bool     `protobuf:"varint,1,opt,name=changed,proto3" json:"changed,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *WatchResponse) Reset()         { *m = WatchResponse{} }
+func (m *WatchResponse) String() string { return proto.CompactTextString(m) }
+func (*WatchResponse) ProtoMessage()    {}
+func (*WatchResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_bda77b776bdcc01c, []int{6}
+}
+
+func (m *WatchResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_WatchResponse.Unmarshal(m, b)
+}
+func (m *WatchResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_WatchResponse.Marshal(b, m, deterministic)
+}
+func (m *WatchResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_WatchResponse.Merge(m, src)
+}
+func (m *WatchResponse) XXX_Size() int {
+	return xxx_messageInfo_WatchResponse.Size(m)
+}
+func (m *WatchResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_WatchResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_WatchResponse proto.InternalMessageInfo
+
+func (m *WatchResponse) GetChanged() bool {
+	if m != nil {
+		return m.Changed
+	}
+	return false
+}
+
 func init() {
+	proto.RegisterType((*GetConfigRequest)(nil), "GetConfigRequest")
+	proto.RegisterType((*GetConfigResponse)(nil), "GetConfigResponse")
 	proto.RegisterType((*GetFileResponse)(nil), "GetFileResponse")
 	proto.RegisterType((*GetFileRequest)(nil), "GetFileRequest")
+	proto.RegisterType((*Application)(nil), "Application")
+	proto.RegisterType((*WatchRequest)(nil), "WatchRequest")
+	proto.RegisterType((*WatchResponse)(nil), "WatchResponse")
 }
 
 func init() { proto.RegisterFile("vconf.proto", fileDescriptor_bda77b776bdcc01c) }
 
 var fileDescriptor_bda77b776bdcc01c = []byte{
-	// 183 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2e, 0x4b, 0xce, 0xcf,
-	0x4b, 0xd3, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x57, 0x32, 0xe6, 0xe2, 0x77, 0x4f, 0x2d, 0x71, 0xcb,
-	0xcc, 0x49, 0x0d, 0x4a, 0x2d, 0x2e, 0xc8, 0xcf, 0x2b, 0x4e, 0x15, 0x52, 0xe0, 0xe2, 0x4e, 0xcb,
-	0xcc, 0x49, 0x75, 0xce, 0xcf, 0x2b, 0x49, 0xcd, 0x2b, 0x91, 0x60, 0x54, 0x60, 0xd4, 0xe0, 0x09,
-	0x42, 0x16, 0x52, 0x4a, 0xe3, 0xe2, 0x83, 0x6b, 0x2a, 0x2c, 0x4d, 0x2d, 0x2e, 0x11, 0x92, 0xe0,
-	0x62, 0x4f, 0x2c, 0x28, 0xf0, 0x4b, 0xcc, 0x4d, 0x05, 0xab, 0xe7, 0x0c, 0x82, 0x71, 0x85, 0xe4,
-	0xb8, 0xb8, 0x12, 0x0b, 0x0a, 0xc2, 0x52, 0x8b, 0x8a, 0x33, 0xf3, 0xf3, 0x24, 0x98, 0xc0, 0x92,
-	0x48, 0x22, 0x42, 0x52, 0x5c, 0x1c, 0x20, 0xa3, 0x03, 0x12, 0x4b, 0x32, 0x24, 0x98, 0xc1, 0xb2,
-	0x70, 0xbe, 0x91, 0x3d, 0x17, 0xaf, 0x73, 0x7e, 0x5e, 0x5a, 0x66, 0x7a, 0x69, 0x51, 0x62, 0x09,
-	0x48, 0xb1, 0x1e, 0x17, 0x3b, 0xd4, 0x62, 0x21, 0x7e, 0x3d, 0x54, 0x27, 0x48, 0x09, 0xe8, 0xa1,
-	0x79, 0x44, 0x89, 0x21, 0x89, 0x0d, 0xec, 0x49, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xce,
-	0x01, 0x58, 0xd7, 0xf3, 0x00, 0x00, 0x00,
+	// 342 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x52, 0x3d, 0x4f, 0xc3, 0x30,
+	0x10, 0x6d, 0xa9, 0xa0, 0xed, 0xb9, 0x9f, 0x9e, 0xa2, 0x0c, 0x28, 0xb2, 0x18, 0x80, 0xc1, 0x42,
+	0x29, 0x0c, 0xb0, 0xa1, 0x4a, 0x74, 0x43, 0x28, 0x95, 0x60, 0xc5, 0x84, 0x4b, 0x6b, 0xa9, 0xb5,
+	0x4d, 0x62, 0xda, 0xbf, 0x8f, 0x62, 0xd2, 0xe0, 0x96, 0x0d, 0xc6, 0xf7, 0x7c, 0xf7, 0x9e, 0xef,
+	0xde, 0x01, 0xd9, 0xa4, 0x5a, 0x65, 0xdc, 0xe4, 0xda, 0x6a, 0xa6, 0x60, 0x34, 0x43, 0x3b, 0xd5,
+	0x2a, 0x93, 0x8b, 0x04, 0x3f, 0x3e, 0xb1, 0xb0, 0x34, 0x80, 0xb6, 0x30, 0xe6, 0x51, 0xac, 0x31,
+	0x68, 0x46, 0xcd, 0xf3, 0x6e, 0xb2, 0x83, 0xf4, 0x14, 0x40, 0x18, 0xf3, 0x8c, 0x79, 0x21, 0xb5,
+	0x0a, 0x8e, 0xdc, 0xa3, 0xc7, 0xd0, 0x08, 0x08, 0xaa, 0x8d, 0xcc, 0xb5, 0x5a, 0xa3, 0xb2, 0x41,
+	0xcb, 0x15, 0xf8, 0x14, 0xbb, 0x85, 0xb1, 0xe7, 0x57, 0x18, 0xad, 0x0a, 0xa4, 0x67, 0xd0, 0x4f,
+	0x1d, 0x33, 0xd5, 0xca, 0x96, 0x8d, 0xdf, 0xb6, 0xfb, 0x24, 0x9b, 0xc0, 0x70, 0x86, 0xf6, 0x41,
+	0xae, 0xb0, 0x6e, 0x8c, 0x80, 0x64, 0x72, 0x85, 0x7e, 0x5b, 0x2f, 0xf1, 0x29, 0x96, 0xc1, 0xa0,
+	0x6e, 0xfa, 0xef, 0x74, 0x21, 0x74, 0x4a, 0xe9, 0x27, 0x61, 0x97, 0xd5, 0x68, 0x35, 0x66, 0x33,
+	0x20, 0xf7, 0xc6, 0xac, 0x64, 0x2a, 0x6c, 0x59, 0xfa, 0x67, 0x13, 0xf6, 0x0a, 0xbd, 0x17, 0x61,
+	0xd3, 0xe5, 0xee, 0xbb, 0x11, 0x90, 0x6d, 0x89, 0x31, 0xf7, 0xd4, 0x7c, 0x8a, 0x72, 0x20, 0xe2,
+	0xc7, 0xda, 0x49, 0x92, 0xb8, 0xc7, 0xbd, 0xef, 0x24, 0x7e, 0x01, 0xbb, 0x80, 0x7e, 0xe5, 0x50,
+	0x6d, 0x31, 0x80, 0x76, 0xba, 0x14, 0x6a, 0x81, 0xef, 0x4e, 0xbe, 0x93, 0xec, 0x60, 0x3c, 0x05,
+	0x32, 0x5f, 0x8b, 0xbc, 0xca, 0x8b, 0x5e, 0x43, 0xb7, 0x0e, 0x8f, 0x8e, 0xf9, 0xe1, 0xe1, 0x84,
+	0x94, 0xff, 0xca, 0x96, 0x35, 0xe2, 0x1b, 0x68, 0x25, 0x62, 0x4b, 0x39, 0xb4, 0xab, 0x24, 0xe8,
+	0x90, 0xef, 0x67, 0x12, 0x8e, 0xf8, 0x41, 0xb2, 0xac, 0x11, 0xdf, 0x55, 0x8b, 0x98, 0x63, 0xbe,
+	0x91, 0x29, 0xd2, 0x4b, 0x38, 0x76, 0x98, 0xf6, 0xb9, 0xbf, 0xa0, 0x70, 0xc0, 0xf7, 0xa6, 0x61,
+	0x8d, 0xab, 0xe6, 0xdb, 0x89, 0x3b, 0xee, 0xc9, 0x57, 0x00, 0x00, 0x00, 0xff, 0xff, 0x6a, 0x7a,
+	0x90, 0x9f, 0xeb, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -149,74 +391,245 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// ConfigurationClient is the client API for Configuration service.
+// SmartConfigClient is the client API for SmartConfig service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type ConfigurationClient interface {
-	GetFile(ctx context.Context, in *GetFileRequest, opts ...grpc.CallOption) (*GetFileResponse, error)
+type SmartConfigClient interface {
+	GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error)
 }
 
-type configurationClient struct {
+type smartConfigClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewConfigurationClient(cc *grpc.ClientConn) ConfigurationClient {
-	return &configurationClient{cc}
+func NewSmartConfigClient(cc *grpc.ClientConn) SmartConfigClient {
+	return &smartConfigClient{cc}
 }
 
-func (c *configurationClient) GetFile(ctx context.Context, in *GetFileRequest, opts ...grpc.CallOption) (*GetFileResponse, error) {
-	out := new(GetFileResponse)
-	err := c.cc.Invoke(ctx, "/Configuration/GetFile", in, out, opts...)
+func (c *smartConfigClient) GetConfig(ctx context.Context, in *GetConfigRequest, opts ...grpc.CallOption) (*GetConfigResponse, error) {
+	out := new(GetConfigResponse)
+	err := c.cc.Invoke(ctx, "/SmartConfig/GetConfig", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ConfigurationServer is the server API for Configuration service.
-type ConfigurationServer interface {
+// SmartConfigServer is the server API for SmartConfig service.
+type SmartConfigServer interface {
+	GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error)
+}
+
+// UnimplementedSmartConfigServer can be embedded to have forward compatible implementations.
+type UnimplementedSmartConfigServer struct {
+}
+
+func (*UnimplementedSmartConfigServer) GetConfig(ctx context.Context, req *GetConfigRequest) (*GetConfigResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetConfig not implemented")
+}
+
+func RegisterSmartConfigServer(s *grpc.Server, srv SmartConfigServer) {
+	s.RegisterService(&_SmartConfig_serviceDesc, srv)
+}
+
+func _SmartConfig_GetConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SmartConfigServer).GetConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/SmartConfig/GetConfig",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SmartConfigServer).GetConfig(ctx, req.(*GetConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _SmartConfig_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "SmartConfig",
+	HandlerType: (*SmartConfigServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetConfig",
+			Handler:    _SmartConfig_GetConfig_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "vconf.proto",
+}
+
+// RawClient is the client API for Raw service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type RawClient interface {
+	GetFile(ctx context.Context, in *GetFileRequest, opts ...grpc.CallOption) (*GetFileResponse, error)
+}
+
+type rawClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewRawClient(cc *grpc.ClientConn) RawClient {
+	return &rawClient{cc}
+}
+
+func (c *rawClient) GetFile(ctx context.Context, in *GetFileRequest, opts ...grpc.CallOption) (*GetFileResponse, error) {
+	out := new(GetFileResponse)
+	err := c.cc.Invoke(ctx, "/Raw/GetFile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// RawServer is the server API for Raw service.
+type RawServer interface {
 	GetFile(context.Context, *GetFileRequest) (*GetFileResponse, error)
 }
 
-// UnimplementedConfigurationServer can be embedded to have forward compatible implementations.
-type UnimplementedConfigurationServer struct {
+// UnimplementedRawServer can be embedded to have forward compatible implementations.
+type UnimplementedRawServer struct {
 }
 
-func (*UnimplementedConfigurationServer) GetFile(ctx context.Context, req *GetFileRequest) (*GetFileResponse, error) {
+func (*UnimplementedRawServer) GetFile(ctx context.Context, req *GetFileRequest) (*GetFileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFile not implemented")
 }
 
-func RegisterConfigurationServer(s *grpc.Server, srv ConfigurationServer) {
-	s.RegisterService(&_Configuration_serviceDesc, srv)
+func RegisterRawServer(s *grpc.Server, srv RawServer) {
+	s.RegisterService(&_Raw_serviceDesc, srv)
 }
 
-func _Configuration_GetFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Raw_GetFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetFileRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ConfigurationServer).GetFile(ctx, in)
+		return srv.(RawServer).GetFile(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Configuration/GetFile",
+		FullMethod: "/Raw/GetFile",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ConfigurationServer).GetFile(ctx, req.(*GetFileRequest))
+		return srv.(RawServer).GetFile(ctx, req.(*GetFileRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Configuration_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "Configuration",
-	HandlerType: (*ConfigurationServer)(nil),
+var _Raw_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "Raw",
+	HandlerType: (*RawServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetFile",
-			Handler:    _Configuration_GetFile_Handler,
+			Handler:    _Raw_GetFile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
+	Metadata: "vconf.proto",
+}
+
+// WatchServiceClient is the client API for WatchService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type WatchServiceClient interface {
+	Watch(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (WatchService_WatchClient, error)
+}
+
+type watchServiceClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewWatchServiceClient(cc *grpc.ClientConn) WatchServiceClient {
+	return &watchServiceClient{cc}
+}
+
+func (c *watchServiceClient) Watch(ctx context.Context, in *WatchRequest, opts ...grpc.CallOption) (WatchService_WatchClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_WatchService_serviceDesc.Streams[0], "/WatchService/Watch", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &watchServiceWatchClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type WatchService_WatchClient interface {
+	Recv() (*WatchResponse, error)
+	grpc.ClientStream
+}
+
+type watchServiceWatchClient struct {
+	grpc.ClientStream
+}
+
+func (x *watchServiceWatchClient) Recv() (*WatchResponse, error) {
+	m := new(WatchResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// WatchServiceServer is the server API for WatchService service.
+type WatchServiceServer interface {
+	Watch(*WatchRequest, WatchService_WatchServer) error
+}
+
+// UnimplementedWatchServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedWatchServiceServer struct {
+}
+
+func (*UnimplementedWatchServiceServer) Watch(req *WatchRequest, srv WatchService_WatchServer) error {
+	return status.Errorf(codes.Unimplemented, "method Watch not implemented")
+}
+
+func RegisterWatchServiceServer(s *grpc.Server, srv WatchServiceServer) {
+	s.RegisterService(&_WatchService_serviceDesc, srv)
+}
+
+func _WatchService_Watch_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(WatchRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(WatchServiceServer).Watch(m, &watchServiceWatchServer{stream})
+}
+
+type WatchService_WatchServer interface {
+	Send(*WatchResponse) error
+	grpc.ServerStream
+}
+
+type watchServiceWatchServer struct {
+	grpc.ServerStream
+}
+
+func (x *watchServiceWatchServer) Send(m *WatchResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+var _WatchService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "WatchService",
+	HandlerType: (*WatchServiceServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Watch",
+			Handler:       _WatchService_Watch_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "vconf.proto",
 }

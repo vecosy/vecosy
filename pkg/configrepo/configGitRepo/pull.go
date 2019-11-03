@@ -40,9 +40,18 @@ func (cr *GitConfigRepo) Pull() error {
 			} else {
 				logrus.Info("already up to date")
 			}
+		} else {
+			cr.callChangeHandlers()
 		}
 		return cr.loadApps()
 	} else {
 		return fmt.Errorf("cannot pull:no remote information found")
+	}
+}
+
+func (cr *GitConfigRepo) callChangeHandlers() {
+	for _, chHandler := range cr.changesHandlers {
+		//FIXME : detect the specific appName and appVersion
+		chHandler("*","")
 	}
 }

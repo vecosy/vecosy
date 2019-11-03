@@ -9,6 +9,7 @@ type RepoFile struct {
 	Version string
 	Content []byte
 }
+type OnChangeHandler func(appName, appVersion string)
 
 type Repo interface {
 	Init() error
@@ -17,4 +18,5 @@ type Repo interface {
 	Pull() error
 	StartPullingEvery(period time.Duration) error
 	StopPulling()
+	AddOnChangeHandler(handler OnChangeHandler)
 }

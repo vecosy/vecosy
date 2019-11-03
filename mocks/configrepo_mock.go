@@ -117,3 +117,15 @@ func (mr *MockRepoMockRecorder) StopPulling() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopPulling", reflect.TypeOf((*MockRepo)(nil).StopPulling))
 }
+
+// AddOnChangeHandler mocks base method
+func (m *MockRepo) AddOnChangeHandler(handler configrepo.OnChangeHandler) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "AddOnChangeHandler", handler)
+}
+
+// AddOnChangeHandler indicates an expected call of AddOnChangeHandler
+func (mr *MockRepoMockRecorder) AddOnChangeHandler(handler interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddOnChangeHandler", reflect.TypeOf((*MockRepo)(nil).AddOnChangeHandler), handler)
+}

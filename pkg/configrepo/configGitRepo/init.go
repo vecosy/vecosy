@@ -21,12 +21,13 @@ func newApp(name string) *app {
 type ErrorHandlerFn func(err error)
 
 type GitConfigRepo struct {
-	repo          *git.Repository
-	Apps          map[string]*app
-	pullCh        chan bool
-	cloneOpts     *git.CloneOptions
-	errorsCh      chan error
-	errorHandlers []ErrorHandlerFn
+	repo            *git.Repository
+	Apps            map[string]*app
+	pullCh          chan bool
+	cloneOpts       *git.CloneOptions
+	errorsCh        chan error
+	errorHandlers   []ErrorHandlerFn
+	changesHandlers []configrepo.OnChangeHandler
 }
 
 func NewConfigRepo(localPath string, cloneOpts *git.CloneOptions) (configrepo.Repo, error) {
@@ -46,7 +47,7 @@ func NewConfigRepo(localPath string, cloneOpts *git.CloneOptions) (configrepo.Re
 		log.Error(err)
 		return nil, err
 	}
-	return &GitConfigRepo{repo, make(map[string]*app), make(chan bool), cloneOpts, make(chan error), make([]ErrorHandlerFn, 0)}, nil
+	return &GitConfigRepo{repo, make(map[string]*app), make(chan bool), cloneOpts, make(chan error), make([]ErrorHandlerFn, 0), make([]configrepo.OnChangeHandler, 0)}, nil
 }
 
 func (cr *GitConfigRepo) Init() error {
@@ -60,4 +61,8 @@ func (cr *GitConfigRepo) GetAppsVersions() map[string][]*version.Version {
 		result[app] = branch.Versions
 	}
 	return result
+}
+
+func (cr *GitConfigRepo) AddOnChangeHandler(handler configrepo.OnChangeHandler) {
+	cr.changesHandlers = append(cr.changesHandlers, handler)
 }
