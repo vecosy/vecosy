@@ -12,7 +12,9 @@ import (
 type Watcher struct {
 	id          string
 	watcherName string
-	apps        map[string]*version.Version
+	appName     string
+	appVersion  *version.Version
+	ch          chan *WatchResponse
 }
 
 type Server struct {
@@ -20,7 +22,6 @@ type Server struct {
 	server         *grpc.Server
 	address        string
 	watchers       sync.Map
-	watcherStreams sync.Map
 }
 
 func New(repo configrepo.Repo, address string) *Server {

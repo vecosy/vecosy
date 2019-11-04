@@ -3,9 +3,11 @@ package vconf
 import (
 	"context"
 	"github.com/golang/mock/gomock"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"google.golang.org/grpc"
+	"io"
 	"testing"
 	"time"
 )
@@ -34,29 +36,32 @@ func TestServer_Watch(t *testing.T) {
 		onChangeHandlerCapture = handler
 	})
 
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	stream, err := cl.Watch(ctx, request)
+	stream, err := cl.Watch(context.Background(), request)
 	assert.NoError(t, err)
-	time.Sleep(2 * time.Second)
-
+	time.Sleep(1 * time.Second)
 	recvWatchCh := make(chan *WatchResponse)
 	go func() {
 		for {
 			response, err := stream.Recv()
+			if err == io.EOF {
+				return
+			}
+			logrus.Debugf("Received %+v", *response)
 			assert.NoError(t, err)
 			recvWatchCh <- response
 		}
 	}()
-	assert.NotNil(t, onChangeHandlerCapture)
 
+	//simulate repo changes
+	assert.NotNil(t, onChangeHandlerCapture)
 	onChangeHandlerCapture(app.AppName, app.AppVersion)
 
 	timeout := time.NewTimer(1 * time.Second).C
 	select {
 	case <-timeout:
-		assert.FailNow(t, "timeout occured")
+		assert.FailNow(t, "timeout occurred")
 	case changed := <-recvWatchCh:
-		t.Logf("Received changes :%+v", changed)
+		logrus.Debugf("Received changes :%+v", *changed)
 	}
 	srv.Stop()
 }
