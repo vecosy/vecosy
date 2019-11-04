@@ -5,6 +5,7 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/sirupsen/logrus"
 	"github.com/vecosy/vecosy/v2/internal/merger"
+	"github.com/vecosy/vecosy/v2/internal/utils"
 )
 
 var smartConfigFileMerger = merger.SmartConfigMerger{}
@@ -17,7 +18,15 @@ func (s *Server) GetConfig(ctx context.Context, request *GetConfigRequest) (*Get
 		log.Errorf("error merging smartconfig:%s", err)
 		return nil, err
 	}
-	yml, err := yaml.Marshal(config)
+
+	normConfig, err := utils.NormalizeMap(config)
+	if err != nil {
+		log.Errorf("error normalizing config:%s", err)
+		return nil, err
+	}
+
+	yml, err := yaml.Marshal(normConfig)
+	logrus.Debugf("received:%s", string(yml))
 	if err != nil {
 		log.Errorf("error generating yaml:%s", err)
 		return nil, err
