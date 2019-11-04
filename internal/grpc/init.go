@@ -1,4 +1,4 @@
-package vconf
+package grpc
 
 import (
 	"github.com/hashicorp/go-version"

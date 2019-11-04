@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 
-protoc -I ./ --go_out=plugins=grpc:internal/grpc vconf.proto
+protoc -I ./ --go_out=plugins=grpc:internal/grpc vecosy.proto
