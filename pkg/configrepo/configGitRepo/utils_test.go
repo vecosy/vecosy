@@ -2,15 +2,16 @@ package configGitRepo
 
 import (
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/vecosy/vecosy/v2/pkg/configrepo"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"gopkg.in/yaml.v2"
 	"os"
 	"testing"
+	"time"
 )
 
 func getConfigYml(t *testing.T, cfgRepo configrepo.Repo, appName, targetVersion string) map[string]interface{} {
@@ -22,8 +23,8 @@ func getConfigYml(t *testing.T, cfgRepo configrepo.Repo, appName, targetVersion 
 }
 
 func editAndPush(t *testing.T, remoteRepo, app, srcVersion, dstVersion, fileName, commitMsg string, content []byte) {
-	editorRepoPath := fmt.Sprintf("%s/%s", testBasicPath, uuid.New().String())
-	t.Logf("editorPath:%s", editorRepoPath)
+	editorRepoPath := fmt.Sprintf("%s_wk", remoteRepo)
+	logrus.Debugf("editorPath:%s", editorRepoPath)
 	editorRepo, err := git.PlainClone(editorRepoPath, false, &git.CloneOptions{URL: remoteRepo, NoCheckout: true})
 	assert.NoError(t, err)
 
@@ -33,26 +34,27 @@ func editAndPush(t *testing.T, remoteRepo, app, srcVersion, dstVersion, fileName
 	err = wk.Checkout(&git.CheckoutOptions{Branch: remoteAppBranch, Force: true})
 	assert.NoError(t, err)
 
+	logrus.Debugf("current branch:%s", remoteAppBranch.String())
 	fl, err := wk.Filesystem.OpenFile(fileName, os.O_RDWR, 0644)
 	assert.NoError(t, err)
 	defer fl.Close()
 	_, err = fl.Write(content)
 	assert.NoError(t, err)
 	assert.NoError(t, fl.Close())
+
 	_, err = wk.Add(fileName)
 	assert.NoError(t, err)
-	_, err = wk.Commit(commitMsg, &git.CommitOptions{All: true, Author: editorSignature,})
-	assert.NoError(t, err)
 
-	head, err := editorRepo.Head()
+	commitHash, err := wk.Commit(commitMsg, &git.CommitOptions{All: true, Author: editorSignature,})
 	assert.NoError(t, err)
-	localBranch := plumbing.ReferenceName(fmt.Sprintf("refs/heads/%s/%s", app, dstVersion))
-	branchRef := plumbing.NewHashReference(localBranch, head.Hash())
-	assert.NoError(t, editorRepo.Storer.SetReference(branchRef))
+	logrus.Debugf("commitHash:%s", commitHash.String())
 
-	reference := config.RefSpec(fmt.Sprintf("%s:%s", localBranch, localBranch))
+	localBranch := plumbing.NewBranchReferenceName(fmt.Sprintf("%s/%s", app, dstVersion))
+	branchRef := plumbing.NewHashReference(localBranch, commitHash)
+	assert.NoError(t, editorRepo.Storer.CheckAndSetReference(branchRef, nil))
+	time.Sleep(1 * time.Second)
 	assert.NoError(t, editorRepo.Push(&git.PushOptions{
 		RemoteName: "origin",
-		RefSpecs:   []config.RefSpec{reference},
+		RefSpecs:   []config.RefSpec{config.DefaultPushRefSpec},
 	}))
 }

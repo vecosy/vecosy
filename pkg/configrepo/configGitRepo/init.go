@@ -2,8 +2,8 @@ package configGitRepo
 
 import (
 	"github.com/hashicorp/go-version"
-	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"github.com/sirupsen/logrus"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
@@ -50,9 +50,10 @@ func NewConfigRepo(localPath string, cloneOpts *git.CloneOptions) (configrepo.Re
 	return &GitConfigRepo{repo, make(map[string]*app), make(chan bool), cloneOpts, make(chan error), make([]ErrorHandlerFn, 0), make([]configrepo.OnChangeHandler, 0)}, nil
 }
 
-func (cr *GitConfigRepo) Init() error {
+func (cr *GitConfigRepo) Init() (err error) {
 	cr.errorHandlerManager()
-	return cr.loadApps()
+	cr.Apps, err = cr.loadApps()
+	return
 }
 
 func (cr *GitConfigRepo) GetAppsVersions() map[string][]*version.Version {

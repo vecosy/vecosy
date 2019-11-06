@@ -1,10 +1,10 @@
 package grpc
 
 import (
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/hashicorp/go-version"
 	"github.com/sirupsen/logrus"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 )
 
 func (s *Server) Watch(request *WatchRequest, stream WatchService_WatchServer) error {
@@ -28,8 +28,9 @@ func (s *Server) addWatcher(request *WatchRequest, stream WatchService_WatchServ
 	}
 	s.watchers.Store(watcher.id, watcher)
 
-	s.repo.AddOnChangeHandler(func(appName, appVersion string) {
-		watcherStreams, err := s.getWatcherStreamByApp(appName, appVersion)
+	s.repo.AddOnChangeHandler(func(application configrepo.ApplicationVersion) {
+		logrus.Infof("Changes detected on application:%+v", application)
+		watcherStreams, err := s.getWatcherStreamByApp(application.AppName, application.AppVersion)
 		if err != nil {
 			logrus.Errorf("Error getting watcher streams:%s", err)
 			return
@@ -56,16 +57,14 @@ func (s *Server) addWatcher(request *WatchRequest, stream WatchService_WatchServ
 }
 
 func (s *Server) getWatcherStreamByApp(appName, appVersion string) ([]*Watcher, error) {
-	cnt, err := version.NewConstraint(fmt.Sprintf("<=%s", appVersion))
+	newVersion, err := version.NewVersion(appVersion)
 	if err != nil {
-		logrus.Errorf("Error creating constraint for version %s err:%s", appVersion, err)
-		return nil, err
+		logrus.Errorf("Error parsing the application version for version %s err:%s", appVersion, err)
 	}
-
 	result := make([]*Watcher, 0)
 	s.watchers.Range(func(watcherId, value interface{}) bool {
 		watcher := value.(*Watcher)
-		if watcher.appName == appName && cnt.Check(watcher.appVersion) {
+		if watcher.appName == appName && watcher.appVersion.GreaterThanOrEqual(newVersion) {
 			result = append(result, watcher)
 		}
 		return true

@@ -8,6 +8,7 @@ import (
 	vconf "github.com/vecosy/vecosy/v2/internal/grpc"
 	"google.golang.org/grpc"
 	"strings"
+	"time"
 )
 
 type Client struct {
@@ -28,7 +29,7 @@ func New(vecosyServer, appName, appVersion, environment string, conf *viper.Vipe
 	}
 	viperInstance.SetConfigType("yaml")
 	vecosyCl := &Client{AppName: appName, AppVersion: appVersion, Environment: environment, viper: viperInstance}
-	vecosyCl.conn, err = grpc.Dial(vecosyServer, grpc.WithInsecure())
+	vecosyCl.conn, err = grpc.Dial(vecosyServer, grpc.WithInsecure(), grpc.WithBackoffConfig(grpc.BackoffConfig{MaxDelay: 30 * time.Second}))
 	if err != nil {
 		logrus.Errorf("Error dialing grpc:%s", err)
 		return nil, err
@@ -63,16 +64,22 @@ func (vc *Client) watchChanges(watcher vconf.WatchService_WatchClient) {
 	for {
 		changes, err := watcher.Recv()
 		if err != nil {
-			logrus.Errorf("error watching changes :%s", err)
-			return
-		}
-		if changes.Changed {
-			err = vc.UpdateConfig()
-			if err != nil {
-				logrus.Errorf("Error updating configuration :%s", err)
+			errorDelay := 10 * time.Second
+			logrus.Errorf("error watching changes wait %s sec error:%s", errorDelay, err)
+			time.Sleep(errorDelay)
+			break
+		} else {
+			if changes.Changed {
+				err = vc.UpdateConfig()
+				if err != nil {
+					logrus.Errorf("Error updating configuration :%s", err)
+				}
 			}
 		}
 	}
+	watcher.CloseSend()
+	// rescheduling myself
+	vc.WatchChanges()
 }
 
 func (vc *Client) UpdateConfig() error {

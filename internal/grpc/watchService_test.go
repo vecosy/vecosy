@@ -54,7 +54,7 @@ func TestServer_Watch(t *testing.T) {
 
 	//simulate repo changes
 	assert.NotNil(t, onChangeHandlerCapture)
-	onChangeHandlerCapture(app.AppName, app.AppVersion)
+	onChangeHandlerCapture(configrepo.ApplicationVersion{AppName: app.AppName, AppVersion: app.AppVersion})
 
 	timeout := time.NewTimer(1 * time.Second).C
 	select {

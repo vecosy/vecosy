@@ -18,7 +18,7 @@ var editorSignature = &object.Signature{
 	When:  time.Now(),
 }
 
-var testBasicPath = fmt.Sprintf("%s/vconf", os.TempDir())
+var testBasicPath = fmt.Sprintf("%s/vecosy_tests", os.TempDir())
 
 func TestMain(m *testing.M) {
 	logrus.SetLevel(logrus.DebugLevel)
@@ -27,8 +27,9 @@ func TestMain(m *testing.M) {
 }
 
 func InitRepos(t *testing.T) (string, string) {
-	localTmpRepo := fmt.Sprintf("%s/%s", testBasicPath, uuid.New().String())
-	remoteTmpRepo := fmt.Sprintf("%s/%s", testBasicPath, uuid.New().String())
+	tmpFolder := uuid.New().String()
+	localTmpRepo := fmt.Sprintf("%s/%s_local", testBasicPath, tmpFolder)
+	remoteTmpRepo := fmt.Sprintf("%s/%s_remote", testBasicPath, tmpFolder)
 	assert.NoError(t, archiver.Unarchive("../../../tests/singleConfigRepo.tgz", remoteTmpRepo))
 	return localTmpRepo, remoteTmpRepo + "/singleConfigRepo"
 }

@@ -9,7 +9,12 @@ type RepoFile struct {
 	Version string
 	Content []byte
 }
-type OnChangeHandler func(appName, appVersion string)
+type ApplicationVersion struct {
+	AppName    string
+	AppVersion string
+}
+
+type OnChangeHandler func(changedApplication ApplicationVersion)
 
 type Repo interface {
 	Init() error
