@@ -1,4 +1,7 @@
+
 # Product Versioned Configuration System
+[![Build Status](https://travis-ci.com/vecosy/vecosy.svg?branch=develop)](https://travis-ci.com/vecosy/vecosy)
+
 **vecosy** is a centralized system based on the application version.
 
 
