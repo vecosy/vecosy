@@ -1,8 +1,8 @@
 server:
   rest:
-    address: ":9080"
+    address: ":8080"
   grpc:
-    address: ":9081"
+    address: ":8081"
 repo:
   remote:
     url: https://github.com/vecosy/config-sample.git

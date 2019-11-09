@@ -45,7 +45,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig, initLogger)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cmd.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./config/vecosy.yml)")
 	verboseFlag = rootCmd.Flags().BoolP("verbose", "v", false, "debug messages")
 }
 
