@@ -35,10 +35,10 @@ func initRepo() configrepo.Repo {
 		logrus.Fatalf("error loading the config repo:%s", err)
 	}
 	pullEvery := viper.GetDuration("repo.remote.pullEvery")
-	logrus.Infof("Pull repo every :%s", pullEvery)
-	err = cfgRepo.StartPullingEvery(pullEvery)
+	logrus.Infof("Fetch repo every :%s", pullEvery)
+	err = cfgRepo.StartFetchingEvery(pullEvery)
 	if err != nil {
-		logrus.Fatalf("error pulling the repo:%s", err)
+		logrus.Fatalf("error fetching the repo:%s", err)
 	}
 	return cfgRepo
 }

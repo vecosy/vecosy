@@ -37,10 +37,10 @@ func NewConfigRepo(localPath string, cloneOpts *git.CloneOptions) (configrepo.Re
 	if err == git.ErrRepositoryNotExists {
 		log.Warn("no repo found")
 		if cloneOpts != nil {
-			log.Infof("cloning it from :%+v", cloneOpts)
 			cloneOpts.Tags = git.AllTags
 			cloneOpts.NoCheckout = true
-			repo, err = git.PlainClone(localPath, true, cloneOpts)
+			log.Infof("cloning it from :%+v", cloneOpts)
+			repo, err = git.PlainClone(localPath, false, cloneOpts)
 		}
 	}
 	if err != nil {

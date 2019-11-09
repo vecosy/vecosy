@@ -78,44 +78,44 @@ func (mr *MockRepoMockRecorder) GetFile(targetApp, targetVersion, path interface
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFile", reflect.TypeOf((*MockRepo)(nil).GetFile), targetApp, targetVersion, path)
 }
 
-// Pull mocks base method
-func (m *MockRepo) Pull() error {
+// Fetch mocks base method
+func (m *MockRepo) Fetch() error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Pull")
+	ret := m.ctrl.Call(m, "Fetch")
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// Pull indicates an expected call of Pull
-func (mr *MockRepoMockRecorder) Pull() *gomock.Call {
+// Fetch indicates an expected call of Fetch
+func (mr *MockRepoMockRecorder) Fetch() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Pull", reflect.TypeOf((*MockRepo)(nil).Pull))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockRepo)(nil).Fetch))
 }
 
-// StartPullingEvery mocks base method
-func (m *MockRepo) StartPullingEvery(period time.Duration) error {
+// StartFetchingEvery mocks base method
+func (m *MockRepo) StartFetchingEvery(period time.Duration) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "StartPullingEvery", period)
+	ret := m.ctrl.Call(m, "StartFetchingEvery", period)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// StartPullingEvery indicates an expected call of StartPullingEvery
-func (mr *MockRepoMockRecorder) StartPullingEvery(period interface{}) *gomock.Call {
+// StartFetchingEvery indicates an expected call of StartFetchingEvery
+func (mr *MockRepoMockRecorder) StartFetchingEvery(period interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartPullingEvery", reflect.TypeOf((*MockRepo)(nil).StartPullingEvery), period)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartFetchingEvery", reflect.TypeOf((*MockRepo)(nil).StartFetchingEvery), period)
 }
 
-// StopPulling mocks base method
-func (m *MockRepo) StopPulling() {
+// StopFetching mocks base method
+func (m *MockRepo) StopFetching() {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "StopPulling")
+	m.ctrl.Call(m, "StopFetching")
 }
 
-// StopPulling indicates an expected call of StopPulling
-func (mr *MockRepoMockRecorder) StopPulling() *gomock.Call {
+// StopFetching indicates an expected call of StopFetching
+func (mr *MockRepoMockRecorder) StopFetching() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopPulling", reflect.TypeOf((*MockRepo)(nil).StopPulling))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StopFetching", reflect.TypeOf((*MockRepo)(nil).StopFetching))
 }
 
 // AddOnChangeHandler mocks base method

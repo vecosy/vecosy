@@ -20,8 +20,8 @@ type Repo interface {
 	Init() error
 	GetAppsVersions() map[string][]*version.Version
 	GetFile(targetApp, targetVersion, path string) (*RepoFile, error)
-	Pull() error
-	StartPullingEvery(period time.Duration) error
-	StopPulling()
+	Fetch() error
+	StartFetchingEvery(period time.Duration) error
+	StopFetching()
 	AddOnChangeHandler(handler OnChangeHandler)
 }

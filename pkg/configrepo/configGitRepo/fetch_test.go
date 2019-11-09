@@ -9,16 +9,16 @@ import (
 	"time"
 )
 
-func TestConfigRepo_PullingEvery(t *testing.T) {
+func TestConfigRepo_FetchingEvery(t *testing.T) {
 	t.Skip("manual test")
 	localRepo, remoteRepo := InitRepos(t)
 	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
-	assert.NoError(t, cfgRepo.StartPullingEvery(1*time.Second))
+	assert.NoError(t, cfgRepo.StartFetchingEvery(1*time.Second))
 	time.Sleep(3 * time.Second)
-	cfgRepo.StopPulling()
+	cfgRepo.StopFetching()
 	time.Sleep(2 * time.Second)
 }
 
@@ -36,7 +36,7 @@ func TestConfigRepo_Pull(t *testing.T) {
 	configContent := getConfigYml(t, cfgRepo, "app1", "v1.0.0")
 	assert.Nil(t, configContent["prop3"])
 
-	assert.NoError(t, cfgRepo.Pull())
+	assert.NoError(t, cfgRepo.Fetch())
 	configContent = getConfigYml(t, cfgRepo, "app1", "v1.0.0")
 	assert.Equal(t, prop3Val, configContent["prop3"])
 }
@@ -55,7 +55,7 @@ func TestConfigRepo_Pull_NewVersion(t *testing.T) {
 	configContent := getConfigYml(t, cfgRepo, "app1", "v10.0.0")
 	assert.Nil(t, configContent["prop3"])
 
-	assert.NoError(t, cfgRepo.Pull())
+	assert.NoError(t, cfgRepo.Fetch())
 	configContent = getConfigYml(t, cfgRepo, "app1", "v10.0.0")
 	assert.Equal(t, prop3Val, configContent["prop3"])
 }

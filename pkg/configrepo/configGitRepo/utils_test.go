@@ -11,7 +11,6 @@ import (
 	"gopkg.in/yaml.v2"
 	"os"
 	"testing"
-	"time"
 )
 
 func getConfigYml(t *testing.T, cfgRepo configrepo.Repo, appName, targetVersion string) map[string]interface{} {
@@ -30,8 +29,12 @@ func editAndPush(t *testing.T, remoteRepo, app, srcVersion, dstVersion, fileName
 
 	wk, err := editorRepo.Worktree()
 	assert.NoError(t, err)
+	localBranch := plumbing.NewBranchReferenceName(fmt.Sprintf("%s/%s", app, dstVersion))
 	remoteAppBranch := plumbing.ReferenceName(fmt.Sprintf("refs/remotes/origin/%s/%s", app, srcVersion))
-	err = wk.Checkout(&git.CheckoutOptions{Branch: remoteAppBranch, Force: true})
+	remoteBranchRef, err := editorRepo.Reference(remoteAppBranch, true)
+	assert.NoError(t, err)
+
+	err = wk.Checkout(&git.CheckoutOptions{Create: true, Hash: remoteBranchRef.Hash(), Branch: localBranch, Force: true})
 	assert.NoError(t, err)
 
 	logrus.Debugf("current branch:%s", remoteAppBranch.String())
@@ -49,10 +52,8 @@ func editAndPush(t *testing.T, remoteRepo, app, srcVersion, dstVersion, fileName
 	assert.NoError(t, err)
 	logrus.Debugf("commitHash:%s", commitHash.String())
 
-	localBranch := plumbing.NewBranchReferenceName(fmt.Sprintf("%s/%s", app, dstVersion))
 	branchRef := plumbing.NewHashReference(localBranch, commitHash)
 	assert.NoError(t, editorRepo.Storer.CheckAndSetReference(branchRef, nil))
-	time.Sleep(1 * time.Second)
 	assert.NoError(t, editorRepo.Push(&git.PushOptions{
 		RemoteName: "origin",
 		RefSpecs:   []config.RefSpec{config.DefaultPushRefSpec},

@@ -5,19 +5,17 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"gopkg.in/src-d/go-git.v4"
-	"gopkg.in/src-d/go-git.v4/config"
-	"gopkg.in/src-d/go-git.v4/storage"
 	"time"
 )
 
-func (cr *GitConfigRepo) StartPullingEvery(period time.Duration) error {
+func (cr *GitConfigRepo) StartFetchingEvery(period time.Duration) error {
 	t := time.NewTicker(period)
 	go func() {
 		for {
 			select {
 			case t := <-t.C:
 				logrus.Debugf("Auto pull :%+s", t)
-				cr.pushError(cr.Pull())
+				cr.pushError(cr.Fetch())
 			case <-cr.pullCh:
 				t.Stop()
 				return
@@ -27,19 +25,18 @@ func (cr *GitConfigRepo) StartPullingEvery(period time.Duration) error {
 	return nil
 }
 
-func (cr *GitConfigRepo) StopPulling() {
+func (cr *GitConfigRepo) StopFetching() {
 	cr.pullCh <- true
 }
 
-func (cr *GitConfigRepo) Pull() error {
-	logrus.Info("Pull")
+func (cr *GitConfigRepo) Fetch() error {
+	logrus.Info("Fetch")
 	if cr.cloneOpts != nil {
-		refs := []config.RefSpec{"*:*"}
-		fetchOpts := &git.FetchOptions{Auth: cr.cloneOpts.Auth, Force: true, Tags: git.AllTags, RefSpecs: refs}
+		fetchOpts := &git.FetchOptions{Auth: cr.cloneOpts.Auth, Force: true, Tags: git.AllTags}
 		err := cr.repo.Fetch(fetchOpts)
-		if err != nil && err != storage.ErrReferenceHasChanged {
+		if err != nil {
 			if err != git.NoErrAlreadyUpToDate {
-				logrus.Errorf("Error pulling :%s", err)
+				logrus.Errorf("Error fetching :%s", err)
 				return err
 			} else {
 				logrus.Info("already up to date")
