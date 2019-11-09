@@ -14,52 +14,30 @@
 * Spring cloud configuration compatible
 * REST
 
-
-
-# Quick start
-## create a configuration repo
-The configuration repository is a GIT repository that follow the branch naming convention
-``[appName]/[appVersion]``
-example
-``myApp/v1.0.0``
-
-### Init the repo
-```shell script
-$> mkdir configData
-$> cd configData
-$> git init .
-```
-### create the first app [myApp]
-```shell script
-$> cd configData
-$> git checkout --orphan myApp/v1.0.0
-```
-### add configuration file and commit
-```shell script
-$> vim myApp.yml
-$> vim myApp-profile.yml # used on spring cloud
-$> git commit -a -m "myApp configuration"
-```
-
+# Demo
+The demo uses the [config-sample](https://github.com/vecosy/config-sample) repository
 ## Run the server
-### Configure the server
-Edit the `config/vconf.yml` and set `repo.url` to the configData folder created before
+```shell script
+$> docker run --rm  -p 8080:8080 -p 8081:8081 vecosy/vecosy:demo
+```
 
-example:
-```
-repo:
-  type: git
-  url: ~/configData
-  path: /tmp/vconfData
-```
-### Run
-```shell script
-./vecosy
-```
-## Call the endpoint
-### REST API
-```shell script
-GET http://localhost:8080/v1/config/myApp/v1.0.0/myApp.yml
-```
-### Spring cloud config API
-example: http://localhost:8080/v1/spring/v1.0.0/myApp/dev
+## Call the endpoints
+### SmartConfig Strategies
+from the [app1/1.0.0](https://github.com/vecosy/config-sample/tree/app1/1.0.0)
+* http://localhost:8080/v1/config/app1/1.0.0/dev
+* http://localhost:8080/v1/config/app1/1.0.0/int
+
+### Spring-could Strategies
+from the [spring-app1/v1.0.0](https://github.com/vecosy/config-sample/tree/spring-app1/1.0.0) 
+* http://localhost:8080/v1/spring/v1.0.0/spring-app1/dev
+* http://localhost:8080/v1/spring/v1.0.0/spring-app1/int
+
+###Raw file
+from the [app1/1.0.0](https://github.com/vecosy/config-sample/tree/app1/1.0.0)
+* http://localhost:8080/v1/raw/app1/1.0.0/config.yml
+* http://localhost:8080/v1/raw/app1/1.0.0/dev/config.yml
+
+from the [spring-app1/1.0.0](https://github.com/vecosy/config-sample/tree/spring-app1/1.0.0) 
+* http://localhost:8080/v1/raw/spring-app1/1.0.0/application.yml
+* http://localhost:8080/v1/raw/spring-app1/1.0.0/spring-app1-dev.yml
+
