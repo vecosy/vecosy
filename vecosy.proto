@@ -1,4 +1,5 @@
 syntax = "proto3";
+package grpc;
 
 service SmartConfig {
     rpc GetConfig (GetConfigRequest) returns (GetConfigResponse) {

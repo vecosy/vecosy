@@ -1,3 +1,5 @@
+// +build integration
+
 package grpc
 
 import (
@@ -7,7 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"google.golang.org/grpc"
-	"io"
 	"testing"
 	"time"
 )
@@ -38,6 +39,18 @@ func TestServer_Watch(t *testing.T) {
 
 	stream, err := cl.Watch(context.Background(), request)
 	assert.NoError(t, err)
+
+	var onChangeHandlerCapture configrepo.OnChangeHandler
+	timeout := time.NewTimer(1 * time.Second)
+	select {
+	case onChangeHandlerCapture = <-onChangeCh:
+		t.Logf("onChange handler captured")
+	case <-timeout.C:
+		assert.FailNow(t, "timeout occurred")
+
+	}
+
+	// waiting for a message
 	recvWatchCh := make(chan *WatchResponse)
 	go func() {
 		for {
@@ -51,16 +64,6 @@ func TestServer_Watch(t *testing.T) {
 			recvWatchCh <- response
 		}
 	}()
-
-	var onChangeHandlerCapture configrepo.OnChangeHandler
-	timeout := time.NewTimer(1 * time.Second)
-	select {
-	case onChangeHandlerCapture = <-onChangeCh:
-		t.Logf("onChange handler captured")
-	case <-timeout.C:
-		assert.FailNow(t, "timeout occurred")
-
-	}
 
 	//simulate repo changes
 	assert.NotNil(t, onChangeHandlerCapture)
