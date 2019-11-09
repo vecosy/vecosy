@@ -1,6 +1,9 @@
 
 # Product Versioned Configuration System
-[![Build Status](https://travis-ci.com/vecosy/vecosy.svg?branch=develop)](https://travis-ci.com/vecosy/vecosy)
+[![Build Status](https://travis-ci.com/vecosy/vecosy.svg)](https://travis-ci.com/vecosy/vecosy)
+![Codecov](https://img.shields.io/codecov/c/github/vecosy/vecosy)
+[![Build Status](https://img.shields.io/badge/docker-pull%20vecosy%2Fvecosy%3Adev-blue)](https://hub.docker.com/repository/docker/vecosy/vecosy)
+![GitHub](https://img.shields.io/github/license/vecosy/vecosy)
 
 **vecosy** is a centralized system based on the application version.
 
@@ -10,6 +13,8 @@
 * GRPC
 * Spring cloud configuration compatible
 * REST
+
+
 
 # Quick start
 ## create a configuration repo

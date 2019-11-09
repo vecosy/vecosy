@@ -31,14 +31,13 @@ func TestServer_Watch(t *testing.T) {
 		Application: app,
 	}
 
-	var onChangeHandlerCapture configrepo.OnChangeHandler
+	onChangeCh := make(chan configrepo.OnChangeHandler, 1)
 	mockRepo.EXPECT().AddOnChangeHandler(gomock.Any()).Do(func(handler configrepo.OnChangeHandler) {
-		onChangeHandlerCapture = handler
+		onChangeCh <- handler
 	})
 
 	stream, err := cl.Watch(context.Background(), request)
 	assert.NoError(t, err)
-	time.Sleep(1 * time.Second)
 	recvWatchCh := make(chan *WatchResponse)
 	go func() {
 		for {
@@ -46,19 +45,30 @@ func TestServer_Watch(t *testing.T) {
 			if err == io.EOF {
 				return
 			}
+			assert.NotNil(t, response)
 			logrus.Debugf("Received %+v", *response)
 			assert.NoError(t, err)
 			recvWatchCh <- response
 		}
 	}()
 
+	var onChangeHandlerCapture configrepo.OnChangeHandler
+	timeout := time.NewTimer(1 * time.Second)
+	select {
+	case onChangeHandlerCapture = <-onChangeCh:
+		t.Logf("onChange handler captured")
+	case <-timeout.C:
+		assert.FailNow(t, "timeout occurred")
+
+	}
+
 	//simulate repo changes
 	assert.NotNil(t, onChangeHandlerCapture)
 	onChangeHandlerCapture(configrepo.ApplicationVersion{AppName: app.AppName, AppVersion: app.AppVersion})
 
-	timeout := time.NewTimer(1 * time.Second).C
+	timeout.Reset(1 * time.Second)
 	select {
-	case <-timeout:
+	case <-timeout.C:
 		assert.FailNow(t, "timeout occurred")
 	case changed := <-recvWatchCh:
 		logrus.Debugf("Received changes :%+v", *changed)

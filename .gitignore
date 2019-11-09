@@ -7,3 +7,4 @@
 *.dylib
 .idea/**/
 .idea
+coverage.txt
