@@ -1,7 +1,7 @@
 
 # Product Versioned Configuration System
 [![Build Status](https://travis-ci.com/vecosy/vecosy.svg)](https://travis-ci.com/vecosy/vecosy)
-![Codecov](https://img.shields.io/codecov/c/github/vecosy/vecosy)
+[![codecov](https://codecov.io/gh/vecosy/vecosy/branch/develop/graph/badge.svg)](https://codecov.io/gh/vecosy/vecosy)
 [![Build Status](https://img.shields.io/badge/docker-pull%20vecosy%2Fvecosy%3Adev-blue)](https://hub.docker.com/repository/docker/vecosy/vecosy)
 ![GitHub](https://img.shields.io/github/license/vecosy/vecosy)
 
