@@ -9,8 +9,7 @@ type SmartConfigMerger struct{}
 
 func (s SmartConfigMerger) Merge(repo configrepo.Repo, appName, appVersion string, profiles []string) (map[interface{}]interface{}, error) {
 	appConfigFiles := getSmartConfigApplicationFilePaths(appName, profiles)
-	finalConfig := mergeFiles(repo, appName, appVersion, appConfigFiles)
-	return finalConfig, nil
+	return mergeFiles(repo, appName, appVersion, appConfigFiles)
 }
 
 func getSmartConfigApplicationFilePaths(appName string, profiles []string) []string {

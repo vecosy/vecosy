@@ -14,6 +14,7 @@ import (
 
 func TestServer_GetFile(t *testing.T) {
 	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	repo := mocks.NewMockRepo(ctrl)
 	srv := New(repo, "127.0.0.1:8080")
 	ht := httptest.New(t, srv.app)

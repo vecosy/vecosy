@@ -16,6 +16,7 @@ import (
 
 func TestServer_GetSmartConfig(t *testing.T) {
 	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	repo := mocks.NewMockRepo(ctrl)
 	srv := New(repo, "127.0.0.1:8080")
 	ht := httptest.New(t, srv.app)
@@ -36,12 +37,12 @@ func TestServer_GetSmartConfig(t *testing.T) {
 	app1DevYmlContent, err := yaml.Marshal(app1DevContent)
 	assert.NoError(t, err)
 
-	repo.EXPECT().GetFile(appName, appVersion, "config.yml").Times(4).Return(&configrepo.RepoFile{
+	repo.EXPECT().GetFile(appName, appVersion, "config.yml").Times(2).Return(&configrepo.RepoFile{
 		Version: commitVersion,
 		Content: app1CommonYmlContent,
 	}, nil)
 
-	repo.EXPECT().GetFile(appName, appVersion, "dev/config.yml").Times(4).Return(&configrepo.RepoFile{
+	repo.EXPECT().GetFile(appName, appVersion, "dev/config.yml").Times(2).Return(&configrepo.RepoFile{
 		Version: commitVersion,
 		Content: app1DevYmlContent,
 	}, nil)

@@ -5,62 +5,57 @@ import (
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
-	"github.com/phayes/freeport"
-	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/vecosy/vecosy/v2/mocks"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
-	"google.golang.org/grpc"
 	"testing"
-	"time"
 )
 
-func TestMain(m *testing.M) {
-	logrus.SetLevel(logrus.DebugLevel)
-	m.Run()
-}
-
 func TestServer_GetFile(t *testing.T) {
+	check := assert.New(t)
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockRepo, srv := initGrpc(ctrl, t)
-
-	appName := "app1"
+	mockRepo := mocks.NewMockRepo(ctrl)
+	srv := New(mockRepo, ":8080")
+	check.NotNil(srv)
+	appName := "app"
 	appVersion := "1.0.0"
-	fileName := "config.yaml"
-	fileContent := []byte(uuid.New().String())
-
-	mockRepo.EXPECT().GetFile(appName, appVersion, fileName).Return(&configrepo.RepoFile{
+	filePath := "config.yml"
+	repoFile := &configrepo.RepoFile{
 		Version: uuid.New().String(),
-		Content: fileContent,
-	}, nil)
-	conn, err := grpc.Dial(srv.address, grpc.WithInsecure())
-	assert.NoError(t, err)
-	defer conn.Close()
-	cl := NewRawClient(conn)
-	req := &GetFileRequest{
+		Content: []byte(uuid.New().String()),
+	}
+	mockRepo.EXPECT().GetFile(appName, appVersion, filePath).Return(repoFile, nil)
+	request := &GetFileRequest{
 		AppName:    appName,
 		AppVersion: appVersion,
-		FilePath:   fileName,
+		FilePath:   filePath,
 	}
-	resp, err := cl.GetFile(context.TODO(), req)
-	assert.NoError(t, err)
-	assert.Equal(t, resp.FileContent, fileContent)
-	srv.Stop()
+	response, err := srv.GetFile(context.TODO(), request)
+	check.NoError(err)
+	check.NotNil(response)
+	check.Equal(response.FileContent, repoFile.Content)
 }
 
-func initGrpc(ctrl *gomock.Controller, t *testing.T) (*mocks.MockRepo, *Server) {
+func TestServer_GetFile_NotFound(t *testing.T) {
+	check := assert.New(t)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	mockRepo := mocks.NewMockRepo(ctrl)
-	freePort, err := freeport.GetFreePort()
-	assert.NoError(t, err)
-	address := fmt.Sprintf("127.0.0.1:%d", freePort)
-	srv := New(mockRepo, address)
-	go func() {
-		err := srv.Start()
-		if err != nil {
-			assert.FailNow(t, "error starting grpc server %s", err)
-		}
-	}()
-	time.Sleep(1 * time.Second)
-	return mockRepo, srv
+	srv := New(mockRepo, ":8080")
+	check.NotNil(srv)
+	appName := "app"
+	appVersion := "1.0.0"
+	filePath := "config.yml"
+
+	notFoundError := fmt.Errorf("not found")
+	mockRepo.EXPECT().GetFile(appName, appVersion, filePath).Return(nil, notFoundError)
+	request := &GetFileRequest{
+		AppName:    appName,
+		AppVersion: appVersion,
+		FilePath:   filePath,
+	}
+	response, err := srv.GetFile(context.TODO(), request)
+	check.EqualError(err, notFoundError.Error())
+	check.Nil(response)
 }

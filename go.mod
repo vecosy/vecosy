@@ -43,6 +43,7 @@ require (
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/phayes/freeport v0.0.0-20180830031419-95f893ade6f2
 	github.com/pierrec/lz4 v2.3.0+incompatible // indirect
+	github.com/pkg/errors v0.8.1
 	github.com/ryanuber/columnize v2.1.0+incompatible // indirect
 	github.com/shurcooL/sanitized_anchor_name v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.4.2

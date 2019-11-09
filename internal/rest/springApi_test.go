@@ -50,6 +50,7 @@ func Test_extractAppNameAndVersion(t *testing.T) {
 
 func TestServer_Get_OnlyProfile(t *testing.T) {
 	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	repo := mocks.NewMockRepo(ctrl)
 	srv := New(repo, "127.0.0.1:8080")
 	ht := httptest.New(t, srv.app)
@@ -108,6 +109,7 @@ func TestServer_Get_OnlyProfile(t *testing.T) {
 
 func TestServer_Get_ProfileAndCommon(t *testing.T) {
 	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	repo := mocks.NewMockRepo(ctrl)
 	srv := New(repo, "127.0.0.1:8080")
 	ht := httptest.New(t, srv.app)
@@ -155,7 +157,7 @@ func TestServer_Get_ProfileAndCommon(t *testing.T) {
 		Content: app1DevYmlContent,
 	}, nil)
 
-	repo.EXPECT().GetFile(appName, appVersion, "application-int.yml").Times(4).Return(&configrepo.RepoFile{
+	repo.EXPECT().GetFile(appName, appVersion, "application-int.yml").Times(1).Return(&configrepo.RepoFile{
 		Version: commitVersion,
 		Content: app1CommonYmlContent,
 	}, nil)
@@ -263,6 +265,7 @@ func TestServer_Get_ProfileAndCommon(t *testing.T) {
 
 func TestServer_Get_InvalidExtension(t *testing.T) {
 	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
 	repo := mocks.NewMockRepo(ctrl)
 	srv := New(repo, "127.0.0.1:8080")
 	ht := httptest.New(t, srv.app)

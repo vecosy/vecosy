@@ -12,7 +12,7 @@ import (
 func (cr *GitConfigRepo) GetNearestBranch(targetApp, targetVersion string) (*plumbing.Reference, error) {
 	app, appFound := cr.Apps[targetApp]
 	if !appFound {
-		return nil, fmt.Errorf("no app found with name %s", targetApp)
+		return nil, configrepo.ApplicationNotFoundError
 	}
 	constraint, err := version.NewConstraint(fmt.Sprintf("<=%s", targetVersion))
 	if err != nil {
