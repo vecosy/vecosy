@@ -41,6 +41,7 @@ func (s *Server) Stop() {
 
 func (s *Server) initV1Api() {
 	v1Api := s.app.Party("/v1")
+	s.registerInfoEndpoints(v1Api)
 	s.registerRawEndpoints(v1Api)
 	s.registerSmartConfigEndpoints(v1Api)
 	s.registerSpringCloudEndpoints(v1Api)
