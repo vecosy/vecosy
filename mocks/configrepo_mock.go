@@ -92,6 +92,20 @@ func (mr *MockRepoMockRecorder) Fetch() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Fetch", reflect.TypeOf((*MockRepo)(nil).Fetch))
 }
 
+// GetLastFetch mocks base method
+func (m *MockRepo) GetLastFetch() *time.Time {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetLastFetch")
+	ret0, _ := ret[0].(*time.Time)
+	return ret0
+}
+
+// GetLastFetch indicates an expected call of GetLastFetch
+func (mr *MockRepoMockRecorder) GetLastFetch() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetLastFetch", reflect.TypeOf((*MockRepo)(nil).GetLastFetch))
+}
+
 // StartFetchingEvery mocks base method
 func (m *MockRepo) StartFetchingEvery(period time.Duration) error {
 	m.ctrl.T.Helper()

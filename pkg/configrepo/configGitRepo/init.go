@@ -6,6 +6,8 @@ import (
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	"sync"
+	"time"
 )
 
 type app struct {
@@ -23,7 +25,9 @@ type ErrorHandlerFn func(err error)
 type GitConfigRepo struct {
 	repo            *git.Repository
 	Apps            map[string]*app
-	pullCh          chan bool
+	fetchCh         chan bool
+	lastFetch       *time.Time
+	lastFetchMutex  sync.Mutex
 	cloneOpts       *git.CloneOptions
 	errorsCh        chan error
 	errorHandlers   []ErrorHandlerFn
@@ -47,7 +51,16 @@ func NewConfigRepo(localPath string, cloneOpts *git.CloneOptions) (configrepo.Re
 		log.Error(err)
 		return nil, err
 	}
-	return &GitConfigRepo{repo, make(map[string]*app), make(chan bool), cloneOpts, make(chan error), make([]ErrorHandlerFn, 0), make([]configrepo.OnChangeHandler, 0)}, nil
+	return &GitConfigRepo{
+		repo:            repo,
+		Apps:            make(map[string]*app),
+		fetchCh:         make(chan bool),
+		lastFetch:       nil,
+		cloneOpts:       cloneOpts,
+		errorsCh:        make(chan error),
+		errorHandlers:   make([]ErrorHandlerFn, 0),
+		changesHandlers: make([]configrepo.OnChangeHandler, 0),
+	}, nil
 }
 
 func (cr *GitConfigRepo) Init() (err error) {

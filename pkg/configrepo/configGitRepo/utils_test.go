@@ -21,7 +21,7 @@ func getConfigYml(t *testing.T, cfgRepo configrepo.Repo, appName, targetVersion 
 	return configContent
 }
 
-func editAndPush(t *testing.T, remoteRepo, app, srcVersion, dstVersion, fileName, commitMsg string, content []byte) {
+func editAndPush(t *testing.T, remoteRepo, app, srcVersion,dstApp, dstVersion, fileName, commitMsg string, content []byte) {
 	editorRepoPath := fmt.Sprintf("%s_wk", remoteRepo)
 	logrus.Debugf("editorPath:%s", editorRepoPath)
 	editorRepo, err := git.PlainClone(editorRepoPath, false, &git.CloneOptions{URL: remoteRepo, NoCheckout: true})
@@ -29,7 +29,7 @@ func editAndPush(t *testing.T, remoteRepo, app, srcVersion, dstVersion, fileName
 
 	wk, err := editorRepo.Worktree()
 	assert.NoError(t, err)
-	localBranch := plumbing.NewBranchReferenceName(fmt.Sprintf("%s/%s", app, dstVersion))
+	localBranch := plumbing.NewBranchReferenceName(fmt.Sprintf("%s/%s", dstApp, dstVersion))
 	remoteAppBranch := plumbing.ReferenceName(fmt.Sprintf("refs/remotes/origin/%s/%s", app, srcVersion))
 	remoteBranchRef, err := editorRepo.Reference(remoteAppBranch, true)
 	assert.NoError(t, err)

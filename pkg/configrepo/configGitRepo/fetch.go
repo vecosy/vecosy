@@ -16,7 +16,7 @@ func (cr *GitConfigRepo) StartFetchingEvery(period time.Duration) error {
 			case t := <-t.C:
 				logrus.Debugf("Auto pull :%+s", t)
 				cr.pushError(cr.Fetch())
-			case <-cr.pullCh:
+			case <-cr.fetchCh:
 				t.Stop()
 				return
 			}
@@ -26,7 +26,7 @@ func (cr *GitConfigRepo) StartFetchingEvery(period time.Duration) error {
 }
 
 func (cr *GitConfigRepo) StopFetching() {
-	cr.pullCh <- true
+	cr.fetchCh <- true
 }
 
 func (cr *GitConfigRepo) Fetch() error {
@@ -57,7 +57,21 @@ func (cr *GitConfigRepo) Fetch() error {
 	} else {
 		return fmt.Errorf("cannot pull:no remote information found")
 	}
+	cr.updateLastFetch()
 	return nil
+}
+
+func (cr *GitConfigRepo) updateLastFetch() {
+	cr.lastFetchMutex.Lock()
+	defer cr.lastFetchMutex.Unlock()
+	lastFetch := time.Now()
+	cr.lastFetch = &lastFetch
+}
+
+func (cr *GitConfigRepo) GetLastFetch() *time.Time {
+	cr.lastFetchMutex.Lock()
+	defer cr.lastFetchMutex.Unlock()
+	return cr.lastFetch
 }
 
 func detectChanges(oldApps, newApps map[string]*app) []configrepo.ApplicationVersion {

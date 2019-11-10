@@ -21,6 +21,7 @@ type Repo interface {
 	GetAppsVersions() map[string][]*version.Version
 	GetFile(targetApp, targetVersion, path string) (*RepoFile, error)
 	Fetch() error
+	GetLastFetch() *time.Time
 	StartFetchingEvery(period time.Duration) error
 	StopFetching()
 	AddOnChangeHandler(handler OnChangeHandler)
