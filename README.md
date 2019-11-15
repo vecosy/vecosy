@@ -32,7 +32,7 @@ from the [spring-app1/v1.0.0](https://github.com/vecosy/config-sample/tree/sprin
 * http://localhost:8080/v1/spring/v1.0.0/spring-app1/dev
 * http://localhost:8080/v1/spring/v1.0.0/spring-app1/int
 
-###Raw file
+### Raw file
 from the [app1/1.0.0](https://github.com/vecosy/config-sample/tree/app1/1.0.0)
 * http://localhost:8080/v1/raw/app1/1.0.0/config.yml
 * http://localhost:8080/v1/raw/app1/1.0.0/dev/config.yml
