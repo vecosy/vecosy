@@ -1,4 +1,8 @@
 FROM golang:latest as builder
+ARG VCS_REF
+LABEL org.label-schema.build-date=$BUILD_DATE \
+      org.label-schema.vcs-ref=$VCS_REF \
+      org.label-schema.vcs-url="https://github.com/vecosy/vecosy"
 WORKDIR /go/src
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o vecosy-server
