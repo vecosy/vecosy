@@ -5,6 +5,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo/configGitRepo"
+	ssh2 "golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport/http"
@@ -50,7 +51,12 @@ func getAuth() (transport.AuthMethod, error) {
 	case "pubKey":
 		keyFile := viper.GetString("repo.remote.auth.keyFile")
 		keyFilePassword := viper.GetString("repo.remote.auth.keyFilePassword")
-		return ssh.NewPublicKeysFromFile(username, keyFile, keyFilePassword)
+		sshAuth, err := ssh.NewPublicKeysFromFile(username, keyFile, keyFilePassword)
+		if err != nil {
+			return nil, err
+		}
+		sshAuth.HostKeyCallback = ssh2.InsecureIgnoreHostKey()
+		return sshAuth, nil
 	case "plain":
 		password := viper.GetString("repo.remote.auth.password")
 		return &ssh.Password{
