@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/vecosy/vecosy/v2/internal/security"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
+	"strings"
 )
 
 func (s *Server) CheckToken(ctx iris.Context, app *configrepo.ApplicationVersion) error {
@@ -12,8 +13,10 @@ func (s *Server) CheckToken(ctx iris.Context, app *configrepo.ApplicationVersion
 	if !s.IsSecurityEnabled() {
 		return nil
 	}
-	token := ctx.GetHeader("token")
+	authorizationHeader := ctx.GetHeader("Authorization")
+	token := strings.Replace(authorizationHeader, "Bearer ", "", 1)
 	log.Debugf("checking token:%s", token)
+
 	err := security.CheckJwtToken(s.repo, app, token)
 	if err != nil {
 		unAuthorizedResponse(ctx)

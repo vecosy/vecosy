@@ -2,6 +2,7 @@ package restapi
 
 import (
 	"crypto/rsa"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/iris-contrib/httpexpect"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,7 @@ func applySecurity(t *testing.T, privKey *rsa.PrivateKey, req *httpexpect.Reques
 	assert.NoError(t, err)
 	jws, err := signer.Sign([]byte("TestApp"))
 	assert.NoError(t, err)
-	req.WithHeader("token", jws.FullSerialize())
+	req.WithHeader("Authorization", fmt.Sprintf("Bearer %s", jws.FullSerialize()))
 	repo.EXPECT().GetFile(app, "pub.key").Return(&configrepo.RepoFile{
 		Version: uuid.New().String(),
 		Content: utils.PublicKeyToBytes(&privKey.PublicKey),
