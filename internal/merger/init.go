@@ -12,10 +12,10 @@ type ConfigMerger interface {
 	Merge(repo configrepo.Repo, appName, appVersion string, profiles []string) (map[interface{}]interface{}, error)
 }
 
-func mergeFiles(repo configrepo.Repo, appName string, appVersion string, appConfigFiles []string, ) (map[interface{}]interface{}, error) {
+func mergeFiles(repo configrepo.Repo, app *configrepo.ApplicationVersion, appConfigFiles []string, ) (map[interface{}]interface{}, error) {
 	finalConfig := make(map[interface{}]interface{})
 	for _, configFilePath := range appConfigFiles {
-		profileFile, err := repo.GetFile(appName, appVersion, configFilePath)
+		profileFile, err := repo.GetFile(app, configFilePath)
 		if err != nil {
 			if err == configrepo.ApplicationNotFoundError {
 				return nil, err

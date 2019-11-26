@@ -1,7 +1,11 @@
-package rest
+package restapi
 
 import (
+	"fmt"
 	"github.com/kataras/iris"
+	"github.com/sirupsen/logrus"
+	"github.com/vecosy/vecosy/v2/internal/validation"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"net/http"
 	"strings"
 )
@@ -42,4 +46,13 @@ func getAccepts(ctx iris.Context) map[string]bool {
 		result[accept] = true
 	}
 	return result
+}
+
+func checkApplication(ctx iris.Context, app *configrepo.ApplicationVersion, log *logrus.Entry) error {
+	err := validation.ValidateApplicationVersion(app)
+	if err != nil {
+		log.Errorf("invalid application: %s", err)
+		badRequest(ctx, fmt.Sprintf("%+v is not a application", app))
+	}
+	return err
 }

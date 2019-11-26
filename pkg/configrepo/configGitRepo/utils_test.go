@@ -14,14 +14,15 @@ import (
 )
 
 func getConfigYml(t *testing.T, cfgRepo configrepo.Repo, appName, targetVersion string) map[string]interface{} {
-	cfgFl, err := cfgRepo.GetFile(appName, targetVersion, "config.yml")
+	app := configrepo.NewApplicationVersion(appName, targetVersion)
+	cfgFl, err := cfgRepo.GetFile(app, "config.yml")
 	assert.NoError(t, err)
 	configContent := make(map[string]interface{})
 	assert.NoError(t, yaml.Unmarshal(cfgFl.Content, configContent))
 	return configContent
 }
 
-func editAndPush(t *testing.T, remoteRepo, app, srcVersion,dstApp, dstVersion, fileName, commitMsg string, content []byte) {
+func editAndPush(t *testing.T, remoteRepo, app, srcVersion, dstApp, dstVersion, fileName, commitMsg string, content []byte) {
 	editorRepoPath := fmt.Sprintf("%s_wk", remoteRepo)
 	logrus.Debugf("editorPath:%s", editorRepoPath)
 	editorRepo, err := git.PlainClone(editorRepoPath, false, &git.CloneOptions{URL: remoteRepo, NoCheckout: true})

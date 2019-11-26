@@ -7,9 +7,9 @@ import (
 
 type SmartConfigMerger struct{}
 
-func (s SmartConfigMerger) Merge(repo configrepo.Repo, appName, appVersion string, profiles []string) (map[interface{}]interface{}, error) {
-	appConfigFiles := getSmartConfigApplicationFilePaths(appName, profiles)
-	return mergeFiles(repo, appName, appVersion, appConfigFiles)
+func (s SmartConfigMerger) Merge(repo configrepo.Repo, app *configrepo.ApplicationVersion, profiles []string) (map[interface{}]interface{}, error) {
+	appConfigFiles := getSmartConfigApplicationFilePaths(app.AppName, profiles)
+	return mergeFiles(repo, app, appConfigFiles)
 }
 
 func getSmartConfigApplicationFilePaths(appName string, profiles []string) []string {

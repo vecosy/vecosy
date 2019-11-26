@@ -1,4 +1,4 @@
-package rest
+package restapi
 
 import (
 	"github.com/hashicorp/go-version"

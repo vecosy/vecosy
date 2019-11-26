@@ -1,4 +1,4 @@
-package grpc
+package grpcapi
 
 import (
 	"github.com/hashicorp/go-version"
@@ -18,14 +18,15 @@ type Watcher struct {
 }
 
 type Server struct {
-	repo           configrepo.Repo
-	server         *grpc.Server
-	address        string
-	watchers       sync.Map
+	repo            configrepo.Repo
+	server          *grpc.Server
+	address         string
+	watchers        sync.Map
+	securityEnabled bool
 }
 
-func New(repo configrepo.Repo, address string) *Server {
-	s := &Server{repo: repo, address: address}
+func New(repo configrepo.Repo, address string, securityEnabled bool) *Server {
+	s := &Server{repo: repo, address: address, securityEnabled: securityEnabled}
 	s.server = grpc.NewServer()
 	RegisterRawServer(s.server, s)
 	RegisterSmartConfigServer(s.server, s)
@@ -46,4 +47,8 @@ func (s *Server) Start() error {
 func (s *Server) Stop() {
 	logrus.Infof("grpc server with address:%s stopped", s.address)
 	s.server.Stop()
+}
+
+func (s *Server) IsSecurityEnabled() bool {
+	return s.securityEnabled
 }

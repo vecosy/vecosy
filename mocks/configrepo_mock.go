@@ -64,18 +64,18 @@ func (mr *MockRepoMockRecorder) GetAppsVersions() *gomock.Call {
 }
 
 // GetFile mocks base method
-func (m *MockRepo) GetFile(targetApp, targetVersion, path string) (*configrepo.RepoFile, error) {
+func (m *MockRepo) GetFile(app *configrepo.ApplicationVersion, path string) (*configrepo.RepoFile, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFile", targetApp, targetVersion, path)
+	ret := m.ctrl.Call(m, "GetFile", app, path)
 	ret0, _ := ret[0].(*configrepo.RepoFile)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetFile indicates an expected call of GetFile
-func (mr *MockRepoMockRecorder) GetFile(targetApp, targetVersion, path interface{}) *gomock.Call {
+func (mr *MockRepoMockRecorder) GetFile(app, path interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFile", reflect.TypeOf((*MockRepo)(nil).GetFile), targetApp, targetVersion, path)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFile", reflect.TypeOf((*MockRepo)(nil).GetFile), app, path)
 }
 
 // Fetch mocks base method

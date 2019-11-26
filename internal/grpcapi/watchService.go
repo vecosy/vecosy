@@ -1,20 +1,33 @@
-package grpc
+package grpcapi
 
 import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/go-version"
 	"github.com/sirupsen/logrus"
+	"github.com/vecosy/vecosy/v2/internal/validation"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 )
 
 func (s *Server) Watch(request *WatchRequest, stream WatchService_WatchServer) error {
-	logrus.Infof("add Watcher :%+v", request)
+	log := logrus.WithField("method", "Watch").WithField("request", request)
+	log.Infof("add Watcher")
+	appVersion := configrepo.NewApplicationVersion(request.Application.AppName, request.Application.AppVersion)
+	err := validation.ValidateApplicationVersion(appVersion)
+	if err != nil {
+		log.Errorf("Error validating the application:%+v", appVersion)
+		return err
+	}
+	err = s.CheckToken(stream.Context(), appVersion)
+	if err != nil {
+		log.Errorf("Error checking token:%s", err)
+		return err
+	}
 	return s.addWatcher(request, stream)
 }
 
 func (s *Server) addWatcher(request *WatchRequest, stream WatchService_WatchServer) error {
 	appRawVer := request.Application.AppVersion
-	appVer, err := version.NewVersion(appRawVer)
+	appVer, err := validation.ParseVersion(appRawVer)
 	if err != nil {
 		logrus.Errorf("Error creating version for version %s err:%s", appRawVer, err)
 		return err
@@ -30,7 +43,7 @@ func (s *Server) addWatcher(request *WatchRequest, stream WatchService_WatchServ
 
 	s.repo.AddOnChangeHandler(func(application configrepo.ApplicationVersion) {
 		logrus.Infof("Changes detected on application:%+v", application)
-		watcherStreams, err := s.getWatcherStreamByApp(application.AppName, application.AppVersion)
+		watcherStreams, err := s.getWatcherStreamByApp(application)
 		if err != nil {
 			logrus.Errorf("Error getting watcher streams:%s", err)
 			return
@@ -56,15 +69,15 @@ func (s *Server) addWatcher(request *WatchRequest, stream WatchService_WatchServ
 	}
 }
 
-func (s *Server) getWatcherStreamByApp(appName, appVersion string) ([]*Watcher, error) {
-	newVersion, err := version.NewVersion(appVersion)
+func (s *Server) getWatcherStreamByApp(app configrepo.ApplicationVersion) ([]*Watcher, error) {
+	newVersion, err := version.NewVersion(app.AppVersion)
 	if err != nil {
-		logrus.Errorf("Error parsing the application version for version %s err:%s", appVersion, err)
+		logrus.Errorf("Error parsing the application version for version %s err:%s", app.AppVersion, err)
 	}
 	result := make([]*Watcher, 0)
 	s.watchers.Range(func(watcherId, value interface{}) bool {
 		watcher := value.(*Watcher)
-		if watcher.appName == appName && watcher.appVersion.GreaterThanOrEqual(newVersion) {
+		if watcher.appName == app.AppName && watcher.appVersion.GreaterThanOrEqual(newVersion) {
 			result = append(result, watcher)
 		}
 		return true

@@ -1,12 +1,10 @@
-package rest
+package restapi
 
 import (
-	"fmt"
 	"github.com/h2non/filetype"
-	"github.com/hashicorp/go-version"
 	"github.com/kataras/iris"
-	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"github.com/sirupsen/logrus"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"mime"
 	"path/filepath"
 )
@@ -23,13 +21,18 @@ func (s *Server) GetFile(ctx iris.Context) {
 	log := logrus.WithField("appName", appName).WithField("appVersion", appVersion).WithField("filePath", filePath)
 	log.Infof("GetFile")
 
-	_, err := version.NewVersion(appVersion)
+	app := configrepo.NewApplicationVersion(appName, appVersion)
+	err := checkApplication(ctx, app, log)
 	if err != nil {
-		log.Errorf("invalid version: %s", err)
-		badRequest(ctx, fmt.Sprintf("%s is not a valid version", appVersion))
+		return
 	}
 
-	file, err := s.repo.GetFile(appName, appVersion, filePath)
+	err = s.CheckToken(ctx, app)
+	if err != nil {
+		return
+	}
+
+	file, err := s.repo.GetFile(app, filePath)
 	if err != nil {
 		log.Errorf("error getting file err:%s", err)
 		if err == configrepo.FileNotFoundError {

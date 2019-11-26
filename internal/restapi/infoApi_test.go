@@ -1,4 +1,4 @@
-package rest
+package restapi
 
 import (
 	"github.com/golang/mock/gomock"
@@ -12,7 +12,7 @@ func TestRest_Info(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	repo := mocks.NewMockRepo(ctrl)
-	srv := New(repo, "127.0.0.1:8080")
+	srv := New(repo, "127.0.0.1:8080",false)
 	ht := httptest.New(t, srv.app)
 
 	v100, _ := version.NewVersion("1.0.0")
@@ -37,7 +37,7 @@ func TestRest_Info_GetApp(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	repo := mocks.NewMockRepo(ctrl)
-	srv := New(repo, "127.0.0.1:8080")
+	srv := New(repo, "127.0.0.1:8080",false)
 	ht := httptest.New(t, srv.app)
 
 	v100, _ := version.NewVersion("1.0.0")
@@ -59,7 +59,7 @@ func TestRest_Info_GetApp_NotFound(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	repo := mocks.NewMockRepo(ctrl)
-	srv := New(repo, "127.0.0.1:8080")
+	srv := New(repo, "127.0.0.1:8080",false)
 	ht := httptest.New(t, srv.app)
 
 	v100, _ := version.NewVersion("1.0.0")

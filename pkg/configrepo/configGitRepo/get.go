@@ -9,12 +9,12 @@ import (
 	"io/ioutil"
 )
 
-func (cr *GitConfigRepo) GetNearestBranch(targetApp, targetVersion string) (*plumbing.Reference, error) {
-	app, appFound := cr.Apps[targetApp]
+func (cr *GitConfigRepo) GetNearestBranch(targetApp *configrepo.ApplicationVersion) (*plumbing.Reference, error) {
+	app, appFound := cr.Apps[targetApp.AppName]
 	if !appFound {
 		return nil, configrepo.ApplicationNotFoundError
 	}
-	constraint, err := version.NewConstraint(fmt.Sprintf("<=%s", targetVersion))
+	constraint, err := version.NewConstraint(fmt.Sprintf("<=%s", targetApp.AppVersion))
 	if err != nil {
 		return nil, err
 	}
@@ -23,12 +23,12 @@ func (cr *GitConfigRepo) GetNearestBranch(targetApp, targetVersion string) (*plu
 			return app.Branches[chkVer.Original()], nil
 		}
 	}
-	return nil, fmt.Errorf("no branch found for target chkVer:%s", targetVersion)
+	return nil, fmt.Errorf("no branch found for target chkVer:%s", targetApp.AppVersion)
 }
 
-func (cr *GitConfigRepo) GetFile(targetApp, targetVersion, path string) (*configrepo.RepoFile, error) {
-	log := logrus.WithField("method", "GetFile").WithField("targetApp", targetApp).WithField("targetVersion", targetVersion).WithField("path", path)
-	branchRef, err := cr.GetNearestBranch(targetApp, targetVersion)
+func (cr *GitConfigRepo) GetFile(targetApp *configrepo.ApplicationVersion, path string) (*configrepo.RepoFile, error) {
+	log := logrus.WithField("method", "GetFile").WithField("targetApp", targetApp).WithField("path", path)
+	branchRef, err := cr.GetNearestBranch(targetApp)
 	if err != nil {
 		return nil, err
 	}

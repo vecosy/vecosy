@@ -14,12 +14,19 @@ type ApplicationVersion struct {
 	AppVersion string
 }
 
+func NewApplicationVersion(name, version string) *ApplicationVersion {
+	return &ApplicationVersion{
+		AppName:    name,
+		AppVersion: version,
+	}
+}
+
 type OnChangeHandler func(changedApplication ApplicationVersion)
 
 type Repo interface {
 	Init() error
 	GetAppsVersions() map[string][]*version.Version
-	GetFile(targetApp, targetVersion, path string) (*RepoFile, error)
+	GetFile(app *ApplicationVersion, path string) (*RepoFile, error)
 	Fetch() error
 	GetLastFetch() *time.Time
 	StartFetchingEvery(period time.Duration) error

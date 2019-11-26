@@ -1,12 +1,13 @@
 // +build integration
 
-package grpc
+package grpcapi
 
 import (
 	"context"
 	"github.com/golang/mock/gomock"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/vecosy/vecosy/v2/internal/utils"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"google.golang.org/grpc"
 	"io"
@@ -17,7 +18,10 @@ import (
 func TestServer_Watch_IT(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockRepo, srv := StartGRPCServerIT(ctrl, t)
+	privKey, _, err := utils.GenerateKeyPair()
+	assert.NoError(t, err)
+
+	mockRepo, srv := StartGRPCServerIT(ctrl, t, true)
 
 	conn, err := grpc.Dial(srv.address, grpc.WithInsecure())
 	assert.NoError(t, err)
@@ -38,7 +42,9 @@ func TestServer_Watch_IT(t *testing.T) {
 		onChangeCh <- handler
 	})
 
-	stream, err := cl.Watch(context.Background(), request)
+	ctx := context.Background()
+	ctx = applySecurityOut(t, privKey, ctx, mockRepo, app.AppName, app.AppVersion)
+	stream, err := cl.Watch(ctx, request)
 	assert.NoError(t, err)
 
 	var onChangeHandlerCapture configrepo.OnChangeHandler

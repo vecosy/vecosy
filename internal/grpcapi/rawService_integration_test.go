@@ -1,6 +1,6 @@
 // +build integration
 
-package grpc
+package grpcapi
 
 import (
 	"context"
@@ -21,14 +21,17 @@ func TestMain(m *testing.M) {
 func TestServer_GetFile_IT(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	mockRepo, srv := StartGRPCServerIT(ctrl, t)
+
+	mockRepo, srv := StartGRPCServerIT(ctrl, t,false)
 
 	appName := "app1"
 	appVersion := "1.0.0"
+	app := configrepo.NewApplicationVersion(appName, appVersion)
+
 	fileName := "config.yaml"
 	fileContent := []byte(uuid.New().String())
 
-	mockRepo.EXPECT().GetFile(appName, appVersion, fileName).Return(&configrepo.RepoFile{
+	mockRepo.EXPECT().GetFile(app, fileName).Return(&configrepo.RepoFile{
 		Version: uuid.New().String(),
 		Content: fileContent,
 	}, nil)

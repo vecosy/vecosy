@@ -1,4 +1,4 @@
-package rest
+package restapi
 
 import (
 	"github.com/kataras/iris"
@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/vecosy/vecosy/v2/internal/merger"
 	"github.com/vecosy/vecosy/v2/internal/utils"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"gopkg.in/yaml.v2"
 	"path"
 	"regexp"
@@ -43,6 +44,18 @@ func (s *Server) springAppInfo(ctx iris.Context) {
 	profiles := strings.Split(profileParam, ",")
 	log := logrus.WithField("appName", appName).WithField("appVersion", appVersion).WithField("profiles", profiles)
 	log.Info("springAppInfo")
+
+	app := configrepo.NewApplicationVersion(appName, appVersion)
+	err := checkApplication(ctx, app, log)
+	if err != nil {
+		return
+	}
+
+	err = s.CheckToken(ctx, app)
+	if err != nil {
+		return
+	}
+
 	response := springSummaryResponse{
 		Name:            appName,
 		Profiles:        profiles,
@@ -52,7 +65,7 @@ func (s *Server) springAppInfo(ctx iris.Context) {
 	}
 
 	for _, configFilePath := range merger.GetSpringApplicationFilePaths(appName, profiles, false) {
-		propertySrc, err := s.getPropertySource(appName, appVersion, configFilePath)
+		propertySrc, err := s.getPropertySource(app, configFilePath)
 		if err != nil {
 			log.Errorf("Error getting resource:%s", err)
 		} else {
@@ -63,7 +76,7 @@ func (s *Server) springAppInfo(ctx iris.Context) {
 		}
 	}
 
-	_, err := ctx.JSON(response)
+	_, err = ctx.JSON(response)
 	if err != nil {
 		log.Errorf("Error responding :%s", err)
 		internalServerError(ctx)
@@ -80,13 +93,24 @@ func (s *Server) springAppFile(ctx iris.Context) {
 	log = log.WithField("profiles", profile).WithField("extension", ext)
 	log.Info("springAppFile")
 
+	app := configrepo.NewApplicationVersion(appName, appVersion)
+	err := checkApplication(ctx, app, log)
+	if err != nil {
+		return
+	}
+
+	err = s.CheckToken(ctx, app)
+	if err != nil {
+		return
+	}
+
 	if ext != ".yml" && ext != ".json" && ext != ".yaml" {
 		log.Errorf("Invalid extension :%s", ext)
 		badRequest(ctx, "invalid extension, only json,yaml are supported")
 		return
 	}
 
-	finalConfig, err := springFileMerger.Merge(s.repo, appName, appVersion, []string{profile})
+	finalConfig, err := springFileMerger.Merge(s.repo, app, []string{profile})
 	if err != nil {
 		log.Errorf("error merging the configuration:%s", err)
 		internalServerError(ctx)
@@ -96,8 +120,8 @@ func (s *Server) springAppFile(ctx iris.Context) {
 }
 
 // Read a config file and convert it to propertySources
-func (s *Server) getPropertySource(appName, appVersion, configFilePath string) (*propertySources, error) {
-	profileFile, err := s.repo.GetFile(appName, appVersion, configFilePath)
+func (s *Server) getPropertySource(app *configrepo.ApplicationVersion, configFilePath string) (*propertySources, error) {
+	profileFile, err := s.repo.GetFile(app, configFilePath)
 	if err != nil {
 		logrus.Warnf("Error getting file:%s, err:%s", configFilePath, err)
 		return nil, err

@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	vecosyGrpc "github.com/vecosy/vecosy/v2/internal/grpc"
+	vecosyGrpc "github.com/vecosy/vecosy/v2/internal/grpcapi"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 	"strings"
 	"sync"
 	"time"
@@ -16,6 +17,7 @@ type Client struct {
 	AppName           string
 	AppVersion        string
 	Environment       string
+	jwsToken          string
 	conn              *grpc.ClientConn
 	watchClient       vecosyGrpc.WatchServiceClient
 	smartConfigClient vecosyGrpc.SmartConfigClient
@@ -23,9 +25,28 @@ type Client struct {
 	updateMutex       sync.Mutex
 }
 
-func New(vecosyServer, appName, appVersion, environment string, conf *viper.Viper) (*Client, error) {
+func NewInsecure(vecosyServer, appName, appVersion, environment string, conf *viper.Viper) (*Client, error) {
 	var err error
 	vecosyCl := &Client{AppName: appName, AppVersion: appVersion, Environment: environment}
+	vecosyCl.initViper(conf)
+	vecosyCl.conn, err = grpc.Dial(vecosyServer, grpc.WithInsecure(), grpc.WithBackoffConfig(grpc.BackoffConfig{MaxDelay: 30 * time.Second}))
+	if err != nil {
+		logrus.Errorf("Error dialing grpc:%s", err)
+		return nil, err
+	}
+	vecosyCl.watchClient = vecosyGrpc.NewWatchServiceClient(vecosyCl.conn)
+	vecosyCl.smartConfigClient = vecosyGrpc.NewSmartConfigClient(vecosyCl.conn)
+	err = vecosyCl.UpdateConfig()
+	if err != nil {
+		logrus.Errorf("Error updating configuration:%s", err)
+		return nil, err
+	}
+	return vecosyCl, nil
+}
+
+func New(vecosyServer, appName, appVersion, environment, jwsToken string, conf *viper.Viper) (*Client, error) {
+	var err error
+	vecosyCl := &Client{AppName: appName, AppVersion: appVersion, Environment: environment, jwsToken: jwsToken}
 	vecosyCl.initViper(conf)
 	vecosyCl.conn, err = grpc.Dial(vecosyServer, grpc.WithInsecure(), grpc.WithBackoffConfig(grpc.BackoffConfig{MaxDelay: 30 * time.Second}))
 	if err != nil {
@@ -51,6 +72,13 @@ func (vc *Client) initViper(conf *viper.Viper) {
 	vc.viper = viperInstance
 }
 
+func (vc *Client) genContext(parent context.Context) context.Context {
+	if vc.jwsToken != "" {
+		return metadata.AppendToOutgoingContext(parent, "token", vc.jwsToken)
+	}
+	return parent
+}
+
 func (vc *Client) WatchChanges() error {
 	request := &vecosyGrpc.WatchRequest{
 		WatcherName: fmt.Sprintf("%s-watcher", vc.AppName),
@@ -59,7 +87,7 @@ func (vc *Client) WatchChanges() error {
 			AppVersion: vc.AppVersion,
 		},
 	}
-	watchStream, err := vc.watchClient.Watch(context.Background(), request)
+	watchStream, err := vc.watchClient.Watch(vc.genContext(context.Background()), request)
 	if err != nil {
 		return err
 	}
@@ -97,7 +125,7 @@ func (vc *Client) UpdateConfig() error {
 		AppVersion:  vc.AppVersion,
 		Environment: vc.Environment,
 	}
-	response, err := vc.smartConfigClient.GetConfig(context.Background(), request)
+	response, err := vc.smartConfigClient.GetConfig(vc.genContext(context.Background()), request)
 	if err != nil {
 		logrus.Errorf("Error getting configuration:%s", err)
 		return err
