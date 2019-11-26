@@ -18,6 +18,8 @@ type Server struct {
 
 func New(repo configrepo.Repo, address string, securityEnabled bool) *Server {
 	s := &Server{repo: repo, address: address, securityEnabled: securityEnabled}
+	log := logrus.WithField("address", address).WithField("securityEnabled", securityEnabled)
+	log.Info("Rest server created")
 	app := iris.New()
 	app.Logger().SetLevel(logrus.GetLevel().String())
 	app.Use(logger.New())

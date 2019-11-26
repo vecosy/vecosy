@@ -11,6 +11,7 @@ import (
 )
 
 var cfgFile string
+var insecureFlag *bool
 var verboseFlag *bool
 
 var rootCmd = &cobra.Command{
@@ -46,6 +47,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig, initLogger)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./config/vecosy.yml)")
+	insecureFlag = rootCmd.PersistentFlags().Bool("insecure", false, "disable the authentication")
 	verboseFlag = rootCmd.Flags().BoolP("verbose", "v", false, "debug messages")
 }
 
@@ -64,10 +66,9 @@ func initConfig() {
 		viper.SetConfigName("vecosy")
 		viper.SetConfigType("yaml")
 	}
-
 	viper.AutomaticEnv()
-
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Println("Using config file:", viper.ConfigFileUsed())
 	}
+	viper.SetDefault("security.enabled", !*insecureFlag)
 }
