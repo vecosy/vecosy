@@ -2,4 +2,4 @@ ignore:
   - "**/*.pb.go"
   - "**/*mock*"
 coverage:
-  range: 70..100
+  range: "70..100"

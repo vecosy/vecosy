@@ -5,8 +5,10 @@
 [![Build Status](https://img.shields.io/badge/docker-pull%20vecosy%2Fvecosy%3Adev-blue)](https://hub.docker.com/repository/docker/vecosy/vecosy)
 ![GitHub](https://img.shields.io/github/license/vecosy/vecosy)
 
-**vecosy** is a centralized system based on the application version.
+**vecosy** is a centralized configuration system
 
+
+![](./docs/schema.png)
 
 ## Features
 * confiurable by a GIT repo
@@ -122,6 +124,82 @@ This will maintain a GRPC connection with the server that will inform the client
 ## More info
 have a look to the [integration test](https://github.com/vecosy/vecosy/blob/develop/pkg/vecosy/init_integration_test.go) for more details
 
+
+# Server Configuration
+
+## No authentication
+```yaml
+server:
+  rest:
+    address: ":8080"
+  grpc:
+    address: ":8081"
+repo:
+  remote:
+    url: https://github.com/vecosy/config-sample.git
+    pullEvery: 30s
+  local:
+    path: /tmp/vecosyData
+```
+
+## plain authentication
+```yaml
+server:
+  rest:
+    address: ":8080"
+  grpc:
+    address: ":8081"
+repo:
+  remote:
+    url: https://github.com/vecosy/config-sample.git
+    pullEvery: 30s
+    auth:
+      type: plain
+      username: gitRepoUsername
+      password: gitRepoPassword
+  local:
+    path: /tmp/vecosyData
+```
+
+## http (basic) authentication
+```yaml
+server:
+  rest:
+    address: ":8080"
+  grpc:
+    address: ":8081"
+repo:
+  remote:
+    url: https://github.com/vecosy/config-sample.git
+    pullEvery: 30s
+    auth:
+      type: http
+      username: gitRepoUsername
+      password: gitRepoPassword
+  local:
+    path: /tmp/vecosyData
+```
+
+## public key authentication
+```yaml
+server:
+  rest:
+    address: ":8080"
+  grpc:
+    address: ":8081"
+repo:
+  remote:
+    url: github.com:vecosy/config-sample.git
+    pullEvery: 30s
+    auth:
+      type: pubKey
+      username: git
+      keyFile: ./myPubKeyFile
+      keyFilePassword: myPubKeyPassword
+  local:
+    path: /tmp/vecosyData
+```
+
 # Demo
 The demo uses the [config-sample](https://github.com/vecosy/config-sample) repository
 ## Run the server
@@ -129,7 +207,46 @@ The demo uses the [config-sample](https://github.com/vecosy/config-sample) repos
 $> docker run --rm  -p 8080:8080 -p 8081:8081 vecosy/vecosy:demo
 ```
 
-## Call the endpoints
+## Golang Client 
+### Generate the JWS token
+Go to [app1/1.0.0 branch](https://github.com/vecosy/config-sample/tree/app1/1.0.0) and run
+```
+echo "app1" | jose-util sign --key priv.key --alg RS256
+```
+the code below has already a valid token
+
+### Code
+```
+package main
+
+import (
+	"fmt"
+	"github.com/spf13/viper"
+	"github.com/vecosy/vecosy/v2/pkg/vecosy"
+)
+
+func main() {
+	jwsToken := "eyJhbGciOiJSUzI1NiJ9.YXBwMQo.A98GFL-P3vtehn0r5GCO_a0OYb5h6trxg3a8WE9hOPDzJ40yOEGtZxyUM6_3Exk65c52-nzWEEc5P-QtgGrgJFOOZlKneKoa1bYBlWRONoysuq95UtSY0doEOMWGvI9AqB685OzmVPuW2UlHg_HlQuuTO6Re1uKc5gr1qZPlyyWEsfoVYTFbfidLoBKWPOuZTxpd8uRx0Rv3LrrmFEcGPHaMNQ2WiXAEJG6OaMTBtwKiynEFH3DU5Rx2WP9M98bH-emC_w7Zq1xKaCOsj2t09F00KohcGC49zSPgPVpp_TwF1qt6_0d0Mnh_Eqi_NHpobVvO85ZOLS05AyW9LQyA5A"
+	vecosyCl, err := vecosy.New("localhost:8081", "app1", "1.0.0", "dev", jwsToken, nil)
+	panicOnError(err)
+	err = vecosyCl.WatchChanges()
+	panicOnError(err)
+	fmt.Printf("db.user:%s\n", viper.GetString("db.user"))
+}
+
+func panicOnError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+```
+
+## Spring Client
+Take a look to [spring-boot-example](https://github.com/vecosy/spring-boot-example)
+
+## Call Endpoints
+Add the `Authorization` header with the token generated before `Bearer [token]`
+
 ### SmartConfig Strategies
 from [app1/1.0.0](https://github.com/vecosy/config-sample/tree/app1/1.0.0)
 * http://localhost:8080/v1/config/app1/1.0.0/dev
@@ -148,3 +265,10 @@ for [app1/1.0.0](https://github.com/vecosy/config-sample/tree/app1/1.0.0)
 for [spring-app1/1.0.0](https://github.com/vecosy/config-sample/tree/spring-app1/1.0.0) 
 * http://localhost:8080/v1/raw/spring-app1/1.0.0/application.yml
 * http://localhost:8080/v1/raw/spring-app1/1.0.0/spring-app1-dev.yml
+
+
+# Future features/improvements
+* web interface
+* metrics
+* different config repo type (etcd, redis,...)
+* improving spring compatibility (watch changes doesn't work right now)
