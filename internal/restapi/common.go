@@ -6,6 +6,8 @@ import (
 	"github.com/vecosy/vecosy/v2/internal/utils"
 )
 
+const invalidFormatErrorMessage = "unsupported extension. Valid formats: [.yml,.json]"
+
 func respondConfig(ctx iris.Context, finalConfig map[interface{}]interface{}, ext string, log *logrus.Entry) {
 	// converting and responding
 	var err error
@@ -20,6 +22,9 @@ func respondConfig(ctx iris.Context, finalConfig map[interface{}]interface{}, ex
 			return
 		}
 		_, err = ctx.JSON(normalizedMap)
+	default:
+		badRequest(ctx, invalidFormatErrorMessage)
+		return
 	}
 	if err != nil {
 		log.Errorf("Error responding :%s", err)

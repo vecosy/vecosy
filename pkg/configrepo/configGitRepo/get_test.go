@@ -46,6 +46,19 @@ func TestConfigRepo_GetNearestBranch_Over(t *testing.T) {
 	assert.Contains(t, branch.Name().String(), "app1/v6.0.0")
 }
 
+func TestConfigRepo_GetNearestBranch_NotFound(t *testing.T) {
+	localRepo, remoteRepo := InitRepos(t)
+	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	assert.NoError(t, err)
+	assert.NotNil(t, cfgRepo)
+	assert.NoError(t, cfgRepo.Init())
+	gitRepo := cfgRepo.(*GitConfigRepo)
+	branch, err := gitRepo.GetNearestBranch(configrepo.NewApplicationVersion("app1", "v0.0.1"))
+	assert.Error(t, err)
+	assert.Nil(t, branch)
+	assert.Errorf(t,err,"no branch found for target chkVer:v0.0.1")
+}
+
 func TestConfigRepo_GetFile(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
 	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
