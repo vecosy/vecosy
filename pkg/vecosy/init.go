@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+type OnChangeHandler = func()
+
 type Client struct {
 	AppName           string
 	AppVersion        string
@@ -23,11 +25,12 @@ type Client struct {
 	smartConfigClient vecosyGrpc.SmartConfigClient
 	viper             *viper.Viper
 	updateMutex       sync.Mutex
+	onChangeHandlers  []OnChangeHandler
 }
 
 func NewInsecure(vecosyServer, appName, appVersion, environment string, conf *viper.Viper) (*Client, error) {
 	var err error
-	vecosyCl := &Client{AppName: appName, AppVersion: appVersion, Environment: environment}
+	vecosyCl := &Client{AppName: appName, AppVersion: appVersion, Environment: environment, onChangeHandlers: make([]OnChangeHandler, 0)}
 	vecosyCl.initViper(conf)
 	vecosyCl.conn, err = grpc.Dial(vecosyServer, grpc.WithInsecure(), grpc.WithBackoffConfig(grpc.BackoffConfig{MaxDelay: 30 * time.Second}))
 	if err != nil {
@@ -46,7 +49,7 @@ func NewInsecure(vecosyServer, appName, appVersion, environment string, conf *vi
 
 func New(vecosyServer, appName, appVersion, environment, jwsToken string, conf *viper.Viper) (*Client, error) {
 	var err error
-	vecosyCl := &Client{AppName: appName, AppVersion: appVersion, Environment: environment, jwsToken: jwsToken}
+	vecosyCl := &Client{AppName: appName, AppVersion: appVersion, Environment: environment, jwsToken: jwsToken, onChangeHandlers: make([]OnChangeHandler, 0)}
 	vecosyCl.initViper(conf)
 	vecosyCl.conn, err = grpc.Dial(vecosyServer, grpc.WithInsecure(), grpc.WithBackoffConfig(grpc.BackoffConfig{MaxDelay: 30 * time.Second}))
 	if err != nil {
@@ -95,6 +98,10 @@ func (vc *Client) WatchChanges() error {
 	return nil
 }
 
+func (vc *Client) AddOnChangeHandler(handler OnChangeHandler) {
+	vc.onChangeHandlers = append(vc.onChangeHandlers, handler)
+}
+
 func (vc *Client) watchChanges(watcher vecosyGrpc.WatchService_WatchClient) {
 	for {
 		changes, err := watcher.Recv()
@@ -108,6 +115,9 @@ func (vc *Client) watchChanges(watcher vecosyGrpc.WatchService_WatchClient) {
 				err = vc.UpdateConfig()
 				if err != nil {
 					logrus.Errorf("Error updating configuration :%s", err)
+				}
+				for _, onChangeHandler := range vc.onChangeHandlers {
+					onChangeHandler()
 				}
 			}
 		}

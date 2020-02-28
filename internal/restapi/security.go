@@ -13,8 +13,13 @@ func (s *Server) CheckToken(ctx iris.Context, app *configrepo.ApplicationVersion
 	if !s.IsSecurityEnabled() {
 		return nil
 	}
+	var token string
 	authorizationHeader := ctx.GetHeader("Authorization")
-	token := strings.Replace(authorizationHeader, "Bearer ", "", 1)
+	if authorizationHeader == "" {
+		token = ctx.GetHeader("X-Config-Token")
+	}else {
+		token = strings.Replace(authorizationHeader, "Bearer ", "", 1)
+	}
 	log.Debugf("checking token:%s", token)
 
 	err := security.CheckJwtToken(s.repo, app, token)

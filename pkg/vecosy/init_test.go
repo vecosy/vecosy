@@ -91,8 +91,13 @@ prop: %s`, environment, propValue2)
 	response2 := &grpcapi.GetConfigResponse{ConfigContent: configContent2}
 	mockSmartConfigCl.EXPECT().GetConfig(gomock.Any(), request).Return(response2, nil)
 
+	onChangeFnCalled := false
+	onChangeFn := func() { onChangeFnCalled = true }
+	vecosyCl.AddOnChangeHandler(onChangeFn)
+
 	checks.NoError(vecosyCl.WatchChanges())
 	time.Sleep(2 * time.Second)
 	checks.Equal(cfg.GetString("environment"), environment)
 	checks.Equal(cfg.GetString("prop"), propValue2)
+	checks.True(onChangeFnCalled)
 }

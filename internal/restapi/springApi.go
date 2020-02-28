@@ -1,6 +1,7 @@
 package restapi
 
 import (
+	"github.com/jeremywohl/flatten"
 	"github.com/kataras/iris"
 	"github.com/kataras/iris/core/router"
 	"github.com/sirupsen/logrus"
@@ -44,7 +45,6 @@ func (s *Server) springAppInfo(ctx iris.Context) {
 	profiles := strings.Split(profileParam, ",")
 	log := logrus.WithField("appName", appName).WithField("appVersion", appVersion).WithField("profiles", profiles)
 	log.Info("springAppInfo")
-
 	app := configrepo.NewApplicationVersion(appName, appVersion)
 	err := checkApplication(ctx, app, log)
 	if err != nil {
@@ -134,13 +134,19 @@ func (s *Server) getPropertySource(app *configrepo.ApplicationVersion, configFil
 		logrus.Errorf("Error parsing yml file:%s, err:%s", configFilePath, err)
 		return nil, err
 	} else {
-		resource := &propertySources{Name: configFilePath, Source: make(map[string]interface{})}
-		resource.Source, err = utils.NormalizeMap(config)
+		configMap, err := utils.NormalizeMap(config)
 		if err != nil {
 			logrus.Errorf("Error normalizing json map:%#+vs, err:%s", config, err)
 			return nil, err
 		}
-		resource.version = profileFile.Version
+
+		flattenMap, err := flatten.Flatten(configMap, "", flatten.DotStyle)
+		if err != nil {
+			logrus.Errorf("Error flattering json map:%#+vs, err:%s", config, err)
+			return nil, err
+		}
+
+		resource := &propertySources{Name: configFilePath, Source: flattenMap, version: profileFile.Version}
 		return resource, nil
 	}
 }
