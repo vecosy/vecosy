@@ -24,11 +24,18 @@ func New(repo configrepo.Repo, address string, securityEnabled bool) *Server {
 	app.Logger().SetLevel(logrus.GetLevel().String())
 	app.Use(logger.New())
 	s.app = app
+	s.initAlive()
 	s.initV1Api()
 	return s
 }
 
-func (s *Server) Start() error {
+func (s *Server) StartTLS(certFile, keyFile string) error {
+	logrus.Infof("Start rest with TLS cert:%s key:%s", certFile, keyFile)
+	return s.app.Run(iris.TLS(s.address, certFile, keyFile), iris.WithoutServerError(iris.ErrServerClosed))
+}
+
+func (s *Server) StartNoTLS() error {
+	logrus.Info("Start rest with NO TLS")
 	return s.app.Run(iris.Addr(s.address), iris.WithoutServerError(iris.ErrServerClosed))
 }
 
@@ -40,6 +47,12 @@ func (s *Server) Stop() {
 			logrus.Warnf("Error stopping REST server:%s", err)
 		}
 	}
+}
+
+func (s *Server) initAlive() {
+	s.app.Get("/alive", func(ctx iris.Context) {
+		_, _ = ctx.WriteString("alive")
+	})
 }
 
 func (s *Server) initV1Api() {

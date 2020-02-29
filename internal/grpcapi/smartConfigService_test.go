@@ -27,7 +27,8 @@ func TestServer_GetConfig(t *testing.T) {
 		t.Run(fmt.Sprintf("GetConfig_Security_%v", security), func(t *testing.T) {
 
 			mockRepo := mocks.NewMockRepo(ctrl)
-			srv := New(mockRepo, ":8080", security)
+			srv, err := NewNoTLS(mockRepo, ":8080", security)
+			check.NoError(err)
 			check.NotNil(srv)
 			app := configrepo.NewApplicationVersion("app", "1.0.0")
 			env := "dev"
@@ -71,7 +72,8 @@ func TestServer_GetConfig_NotFound(t *testing.T) {
 	for _, security := range []bool{false, true} {
 		t.Run(fmt.Sprintf("GetConfig_NotFound_Security_%v", security), func(t *testing.T) {
 			mockRepo := mocks.NewMockRepo(ctrl)
-			srv := New(mockRepo, ":8080", security)
+			srv, err := NewNoTLS(mockRepo, ":8080", security)
+			check.NoError(err)
 			check.NotNil(srv)
 			app := configrepo.NewApplicationVersion("app", "1.0.0")
 			env := "dev"
@@ -103,7 +105,8 @@ func TestServer_GetConfig_Unauthorized(t *testing.T) {
 	assert.NoError(t, err)
 
 	mockRepo := mocks.NewMockRepo(ctrl)
-	srv := New(mockRepo, ":8080", true)
+	srv, err := NewNoTLS(mockRepo, ":8080", true)
+	check.NoError(err)
 	check.NotNil(srv)
 	app := configrepo.NewApplicationVersion("app", "1.0.0")
 	env := "dev"
@@ -129,22 +132,23 @@ func TestServer_GetConfig_InvalidApp(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockRepo(ctrl)
-	srv := New(mockRepo, ":8080", true)
+	srv, err := NewNoTLS(mockRepo, ":8080", true)
+	check.NoError(err)
 	check.NotNil(srv)
 
 	badAppNameRequest := &GetConfigRequest{
-		AppName:    "",
-		AppVersion: "1.0.0",
-		Environment:"dev",
+		AppName:     "",
+		AppVersion:  "1.0.0",
+		Environment: "dev",
 	}
 	response, err := srv.GetConfig(context.Background(), badAppNameRequest)
 	check.Equal(err, validation.InvalidApplicationName)
 	check.Nil(response)
 
 	badAppVersionRequest := &GetConfigRequest{
-		AppName:    "app1",
-		AppVersion: "",
-		Environment:"dev",
+		AppName:     "app1",
+		AppVersion:  "",
+		Environment: "dev",
 	}
 	response, err = srv.GetConfig(context.Background(), badAppVersionRequest)
 	check.Equal(err, validation.InvalidVersion)

@@ -3,8 +3,8 @@ package configGitRepo
 import (
 	"fmt"
 	"github.com/hashicorp/go-version"
-	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"github.com/sirupsen/logrus"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	"io/ioutil"
 )

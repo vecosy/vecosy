@@ -5,6 +5,7 @@ import (
 	"github.com/ghodss/yaml"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
+	"github.com/jeremywohl/flatten"
 	"github.com/kataras/iris/httptest"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -78,10 +79,12 @@ func TestServer_Get_OnlyProfile(t *testing.T) {
 		}, nil)
 
 		t.Run(fmt.Sprintf("springAppInfo_security_%v", security), func(t *testing.T) {
+			flattenApp1DevContent, err := flatten.Flatten(app1DevContent, "", flatten.DotStyle)
+			assert.NoError(t, err)
 			expectedPropertySources := []*propertySources{
 				{
 					Name:    "app1-dev.yml",
-					Source:  app1DevContent,
+					Source:  flattenApp1DevContent,
 					version: commitVersion,
 				},
 			}
@@ -201,25 +204,29 @@ func TestServer_Get_ProfileAndCommon(t *testing.T) {
 		}, nil)
 
 		t.Run(fmt.Sprintf("getSpringFileByAppAndProfile_SingleProfile_security:%v", security), func(t *testing.T) {
+			flattenApp1DevContent, err := flatten.Flatten(app1DevContent, "", flatten.DotStyle)
+			assert.NoError(t, err)
+			flattenApp1CommonContent, err := flatten.Flatten(app1CommonContent, "", flatten.DotStyle)
+			assert.NoError(t, err)
 			expectedPropertySources := []*propertySources{
 				{
 					Name:    "app1-dev.yml",
-					Source:  app1DevContent,
+					Source:  flattenApp1DevContent,
 					version: commitVersion,
 				},
 				{
 					Name:    "application-dev.yml",
-					Source:  app1CommonContent,
+					Source:  flattenApp1CommonContent,
 					version: commitVersion,
 				},
 				{
 					Name:    "app1.yml",
-					Source:  app1CommonContent,
+					Source:  flattenApp1CommonContent,
 					version: commitVersion,
 				},
 				{
 					Name:    "application.yml",
-					Source:  app1CommonContent,
+					Source:  flattenApp1CommonContent,
 					version: commitVersion,
 				},
 			}
@@ -241,35 +248,41 @@ func TestServer_Get_ProfileAndCommon(t *testing.T) {
 		})
 
 		t.Run(fmt.Sprintf("getSpringFileByAppAndProfile_MultiProfile_security:%v", security), func(t *testing.T) {
+			flattenApp1IntContent, err := flatten.Flatten(app1IntContent, "", flatten.DotStyle)
+			assert.NoError(t, err)
+			flattenApp1DevContent, err := flatten.Flatten(app1DevContent, "", flatten.DotStyle)
+			assert.NoError(t, err)
+			flattenApp1CommonContent, err := flatten.Flatten(app1CommonContent, "", flatten.DotStyle)
+			assert.NoError(t, err)
 			expectedPropertySources := []*propertySources{
 				{
 					Name:    "app1-int.yml",
-					Source:  app1IntContent,
+					Source:  flattenApp1IntContent,
 					version: commitVersion,
 				},
 				{
 					Name:    "application-int.yml",
-					Source:  app1CommonContent,
+					Source:  flattenApp1CommonContent,
 					version: commitVersion,
 				},
 				{
 					Name:    "app1-dev.yml",
-					Source:  app1DevContent,
+					Source:  flattenApp1DevContent,
 					version: commitVersion,
 				},
 				{
 					Name:    "application-dev.yml",
-					Source:  app1CommonContent,
+					Source:  flattenApp1CommonContent,
 					version: commitVersion,
 				},
 				{
 					Name:    "app1.yml",
-					Source:  app1CommonContent,
+					Source:  flattenApp1CommonContent,
 					version: commitVersion,
 				},
 				{
 					Name:    "application.yml",
-					Source:  app1CommonContent,
+					Source:  flattenApp1CommonContent,
 					version: commitVersion,
 				},
 			}

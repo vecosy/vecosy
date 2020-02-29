@@ -26,7 +26,8 @@ func TestServer_Watch(t *testing.T) {
 	for _, security := range []bool{false, true} {
 		t.Run(fmt.Sprintf("Watch_Security_%v", security), func(t *testing.T) {
 			mockRepo := mocks.NewMockRepo(ctrl)
-			srv := New(mockRepo, ":8080", security)
+			srv, err := NewNoTLS(mockRepo, ":8080", security)
+			check.NoError(err)
 			check.NotNil(srv)
 			appName := "app"
 			appVersion := "1.0.0"
@@ -70,7 +71,8 @@ func TestServer_Watch_Unauthorized(t *testing.T) {
 	assert.NoError(t, err)
 
 	mockRepo := mocks.NewMockRepo(ctrl)
-	srv := New(mockRepo, ":8080", true)
+	srv, err := NewNoTLS(mockRepo, ":8080", true)
+	check.NoError(err)
 	check.NotNil(srv)
 	appName := "app"
 	appVersion := "1.0.0"
@@ -99,7 +101,8 @@ func TestServer_Watch_InvalidApplication(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockRepo(ctrl)
-	srv := New(mockRepo, ":8080", true)
+	srv, err := NewNoTLS(mockRepo, ":8080", true)
+	check.NoError(err)
 	check.NotNil(srv)
 
 	badAppNameRequest := &WatchRequest{
@@ -110,7 +113,7 @@ func TestServer_Watch_InvalidApplication(t *testing.T) {
 		},
 	}
 	stream := NewMockWatchService_WatchServer(ctrl)
-	err := srv.Watch(badAppNameRequest, stream)
+	err = srv.Watch(badAppNameRequest, stream)
 	check.Equal(err, validation.InvalidApplicationName)
 
 	badAppVersionRequest := &WatchRequest{

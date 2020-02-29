@@ -17,7 +17,7 @@ func (s *Server) CheckToken(ctx iris.Context, app *configrepo.ApplicationVersion
 	authorizationHeader := ctx.GetHeader("Authorization")
 	if authorizationHeader == "" {
 		token = ctx.GetHeader("X-Config-Token")
-	}else {
+	} else {
 		token = strings.Replace(authorizationHeader, "Bearer ", "", 1)
 	}
 	log.Debugf("checking token:%s", token)

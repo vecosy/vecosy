@@ -8,9 +8,14 @@ import (
 )
 
 func startRest(cfgRepo configrepo.Repo) {
-	viper.SetDefault("server.rest.address", ":8080")
+	var err error
+	viper.SetDefault("server.rest.address", ":443")
 	restSrv := restapi.New(cfgRepo, viper.GetString("server.rest.address"), viper.GetBool("security.enabled"))
-	err := restSrv.Start()
+	if viper.GetBool("server.tls.enabled") {
+		err = restSrv.StartTLS(viper.GetString("server.tls.certificateFile"), viper.GetString("server.tls.keyFile"))
+	} else {
+		err = restSrv.StartNoTLS()
+	}
 	if err != nil {
 		logrus.Fatalf("error starting rest server:%s", err)
 	}

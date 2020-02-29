@@ -49,7 +49,7 @@ func editAndPush(t *testing.T, remoteRepo, app, srcVersion, dstApp, dstVersion, 
 	_, err = wk.Add(fileName)
 	assert.NoError(t, err)
 
-	commitHash, err := wk.Commit(commitMsg, &git.CommitOptions{All: true, Author: editorSignature,})
+	commitHash, err := wk.Commit(commitMsg, &git.CommitOptions{All: true, Author: editorSignature})
 	assert.NoError(t, err)
 	logrus.Debugf("commitHash:%s", commitHash.String())
 

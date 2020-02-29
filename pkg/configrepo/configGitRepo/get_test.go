@@ -56,7 +56,7 @@ func TestConfigRepo_GetNearestBranch_NotFound(t *testing.T) {
 	branch, err := gitRepo.GetNearestBranch(configrepo.NewApplicationVersion("app1", "v0.0.1"))
 	assert.Error(t, err)
 	assert.Nil(t, branch)
-	assert.Errorf(t,err,"no branch found for target chkVer:v0.0.1")
+	assert.Errorf(t, err, "no branch found for target chkVer:v0.0.1")
 }
 
 func TestConfigRepo_GetFile(t *testing.T) {

@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"net"
 	"sync"
 )
@@ -25,13 +26,28 @@ type Server struct {
 	securityEnabled bool
 }
 
-func New(repo configrepo.Repo, address string, securityEnabled bool) *Server {
+func NewTLS(repo configrepo.Repo, address string, securityEnabled bool, certFile, keyFile string) (*Server, error) {
+	tlsCreds, err := credentials.NewServerTLSFromFile(certFile, keyFile)
+	if err != nil {
+		return nil, err
+	}
+	s := &Server{repo: repo, address: address, securityEnabled: securityEnabled}
+	s.server = grpc.NewServer(grpc.Creds(tlsCreds))
+	s.registerServices()
+	return s, nil
+}
+
+func NewNoTLS(repo configrepo.Repo, address string, securityEnabled bool) (*Server, error) {
 	s := &Server{repo: repo, address: address, securityEnabled: securityEnabled}
 	s.server = grpc.NewServer()
+	s.registerServices()
+	return s, nil
+}
+
+func (s *Server) registerServices() {
 	RegisterRawServer(s.server, s)
 	RegisterSmartConfigServer(s.server, s)
 	RegisterWatchServiceServer(s.server, s)
-	return s
 }
 
 func (s *Server) Start() error {

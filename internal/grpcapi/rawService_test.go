@@ -25,7 +25,8 @@ func TestServer_GetFile(t *testing.T) {
 	for _, security := range []bool{false, true} {
 		t.Run(fmt.Sprintf("GetFile_Security_%v", security), func(t *testing.T) {
 			mockRepo := mocks.NewMockRepo(ctrl)
-			srv := New(mockRepo, ":8080", security)
+			srv, err := NewNoTLS(mockRepo, ":8080", security)
+			check.NoError(err)
 			check.NotNil(srv)
 			app := configrepo.NewApplicationVersion("app", "1.0.0")
 
@@ -62,7 +63,8 @@ func TestServer_GetFile_NotFound(t *testing.T) {
 	for _, security := range []bool{false, true} {
 		t.Run(fmt.Sprintf("GetFile_NotFound_Security_%v", security), func(t *testing.T) {
 			mockRepo := mocks.NewMockRepo(ctrl)
-			srv := New(mockRepo, ":8080", security)
+			srv, err := NewNoTLS(mockRepo, ":8080", security)
+			check.NoError(err)
 			check.NotNil(srv)
 			app := configrepo.NewApplicationVersion("app", "1.0.0")
 			filePath := "config.yml"
@@ -94,7 +96,8 @@ func TestServer_GetFile_Unauthorized(t *testing.T) {
 	assert.NoError(t, err)
 
 	mockRepo := mocks.NewMockRepo(ctrl)
-	srv := New(mockRepo, ":8080", true)
+	srv, err := NewNoTLS(mockRepo, ":8080", true)
+	check.NoError(err)
 	check.NotNil(srv)
 	app := configrepo.NewApplicationVersion("app", "1.0.0")
 	filePath := "config.yml"
@@ -120,7 +123,8 @@ func TestServer_GetFile_InvalidApp(t *testing.T) {
 	defer ctrl.Finish()
 
 	mockRepo := mocks.NewMockRepo(ctrl)
-	srv := New(mockRepo, ":8080", true)
+	srv, err := NewNoTLS(mockRepo, ":8080", true)
+	check.NoError(err)
 	check.NotNil(srv)
 	filePath := "config.yml"
 

@@ -1,6 +1,8 @@
 server:
+  tls:
+    enabled: false
   rest:
-    address: ":8443"
+    address: ":8080"
   grpc:
     address: ":8081"
 repo:

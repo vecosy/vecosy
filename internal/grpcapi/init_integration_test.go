@@ -21,7 +21,8 @@ func StartGRPCServerIT(ctrl *gomock.Controller, t *testing.T, security bool) (*m
 	freePort, err := freeport.GetFreePort()
 	assert.NoError(t, err)
 	address := fmt.Sprintf("127.0.0.1:%d", freePort)
-	srv := New(mockRepo, address, security)
+	srv, err := NewNoTLS(mockRepo, address, security)
+	assert.NoError(t, err)
 	go func() {
 		err := srv.Start()
 		if err != nil {

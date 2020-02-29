@@ -83,7 +83,7 @@ the generated token can be used as *Bearer* Authorization header, in the `token`
 ### 3. Configure your application to use the JWS token
 
 #### vecosy-client (golang)
-passing on the `vecosy.New(...)` parameter 
+passing on the `vecosy.NewBuilder(...).WithJWSToken(jwsToken)` parameter 
 
 #### Spring-cloud application (java)
 by Spring cloud configuration [token](https://github.com/vecosy/spring-boot-example/blob/master/src/main/resources/bootstrap.yml)
@@ -97,27 +97,44 @@ Vecosy client use [viper](https://github.com/spf13/viper) as configuration syste
 ## Specific viper configuration
 ```
     cfg := viper.New()
-    vecosyCl,err:= vecosy.New("my-vecosy-server:8080","myApp", "myAppVersion", "integration", jwsToken, cfg)
+    vecosyCl,err := vecosy.NewBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
+        WithJWStoken(jwsToken).
+        Build(cfg)
     // now you can use cfg to get the your app configuration
     cfg.getString("my.app.config")
 ```
 
 ## Default viper configuration 
 ```
-    vecosyCl,err:= vecosy.New("my-vecosy-server:8080","myApp", "myAppVersion", "integration", jwsToken, nil)
+    vecosyCl,err := vecosy.NewBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
+        WithJWStoken(jwsToken).
+        Build(nil)
     viper.getString("my.app.config")
 ```
 
 ## Insecure connection 
 The server has to be started with `--insecure` option
 ```
-    vecosyCl,err:= vecosy.NewInsecure("my-vecosy-server:8080","myApp", "myAppVersion", "integration", nil)
+    vecosyCl,err := vecosy.NewBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
+        Insecure().
+        Build(nil)
+    viper.getString("my.app.config")
+```
+
+## TLS connection
+```
+    vecosyCl,err:= vecosy.NewBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
+        WithTLS("./myTrust.crt").
+        WithJWSToken(jwsToken).
+        Build(nil)
     viper.getString("my.app.config")
 ```
 
 ## Watch changes
 ```
-    vecosyCl,err:= vecosy.New("my-vecosy-server:8080","myApp", "myAppVersion", "integration",jwsToken, nil)
+    vecosyCl,err:= vecosy.NewBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
+        WithJWStoken(jwsToken).
+        Build(nil)
     vecosyCl.WatchChanges()
 ```
 This will maintain a GRPC connection with the server that will inform the client on every configuration changes on the git repo.
@@ -125,16 +142,26 @@ This will maintain a GRPC connection with the server that will inform the client
 ## More info
 have a look to the [integration test](https://github.com/vecosy/vecosy/blob/develop/pkg/vecosy/init_integration_test.go) for more details
 
-
 # Server Configuration
+*some configuration options can be passed via command line run `vecosy-server --help` for the options*
 
-## No authentication
+## TLS
 ```yaml
 server:
+  tls:
+    enabled: true
+    certificateFile: ./myCert.crt
+    keyFile: ./myCert.key
   rest:
-    address: ":8080"
+    address: ":8443"
   grpc:
     address: ":8081"
+...
+```
+## GIT authentication
+### No authentication
+```yaml
+...
 repo:
   remote:
     url: https://github.com/vecosy/config-sample.git
@@ -143,13 +170,9 @@ repo:
     path: /tmp/vecosyData
 ```
 
-## plain authentication
+### plain authentication
 ```yaml
-server:
-  rest:
-    address: ":8080"
-  grpc:
-    address: ":8081"
+...
 repo:
   remote:
     url: https://github.com/vecosy/config-sample.git
@@ -162,13 +185,9 @@ repo:
     path: /tmp/vecosyData
 ```
 
-## http (basic) authentication
+### http (basic) authentication
 ```yaml
-server:
-  rest:
-    address: ":8080"
-  grpc:
-    address: ":8081"
+...
 repo:
   remote:
     url: https://github.com/vecosy/config-sample.git
@@ -181,11 +200,31 @@ repo:
     path: /tmp/vecosyData
 ```
 
-## public key authentication
+### public key authentication
+```yaml
+...
+repo:
+  remote:
+    url: github.com:vecosy/config-sample.git
+    pullEvery: 30s
+    auth:
+      type: pubKey
+      username: git
+      keyFile: ./myPubKeyFile
+      keyFilePassword: myPubKeyPassword
+  local:
+    path: /tmp/vecosyData
+```
+
+## Full Example
 ```yaml
 server:
+  tls:
+    enabled: true
+    certificateFile: ./myCert.crt
+    keyFile: ./myCert.key
   rest:
-    address: ":8080"
+    address: ":8443"
   grpc:
     address: ":8081"
 repo:
@@ -214,9 +253,9 @@ Go to [app1/1.0.0 branch](https://github.com/vecosy/config-sample/tree/app1/1.0.
 ```
 echo "app1" | jose-util sign --key priv.key --alg RS256
 ```
-the code below has already a valid token
+*the code below has already a valid token for the vecosy:demo*
 
-### Code
+### Without TLS
 ```
 package main
 
@@ -228,7 +267,34 @@ import (
 
 func main() {
 	jwsToken := "eyJhbGciOiJSUzI1NiJ9.YXBwMQo.A98GFL-P3vtehn0r5GCO_a0OYb5h6trxg3a8WE9hOPDzJ40yOEGtZxyUM6_3Exk65c52-nzWEEc5P-QtgGrgJFOOZlKneKoa1bYBlWRONoysuq95UtSY0doEOMWGvI9AqB685OzmVPuW2UlHg_HlQuuTO6Re1uKc5gr1qZPlyyWEsfoVYTFbfidLoBKWPOuZTxpd8uRx0Rv3LrrmFEcGPHaMNQ2WiXAEJG6OaMTBtwKiynEFH3DU5Rx2WP9M98bH-emC_w7Zq1xKaCOsj2t09F00KohcGC49zSPgPVpp_TwF1qt6_0d0Mnh_Eqi_NHpobVvO85ZOLS05AyW9LQyA5A"
-	vecosyCl, err := vecosy.New("localhost:8081", "app1", "1.0.0", "dev", jwsToken, nil)
+	vecosyCl, err := vecosy.NewBuilder("localhost:8081", "app1", "1.0.0", "dev").WithJWSToken(jwsToken).Build(nil)
+	panicOnError(err)
+	err = vecosyCl.WatchChanges()
+	panicOnError(err)
+	fmt.Printf("db.user:%s\n", viper.GetString("db.user"))
+}
+
+func panicOnError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+```
+
+### With TLS
+```
+package main
+
+import (
+	"fmt"
+	"github.com/spf13/viper"
+	"github.com/vecosy/vecosy/v2/pkg/vecosy"
+)
+
+func main() {
+    trustCert := "./myTrustCert.crt"
+	jwsToken := "eyJhbGciOiJSUzI1NiJ9.YXBwMQo.A98GFL-P3vtehn0r5GCO_a0OYb5h6trxg3a8WE9hOPDzJ40yOEGtZxyUM6_3Exk65c52-nzWEEc5P-QtgGrgJFOOZlKneKoa1bYBlWRONoysuq95UtSY0doEOMWGvI9AqB685OzmVPuW2UlHg_HlQuuTO6Re1uKc5gr1qZPlyyWEsfoVYTFbfidLoBKWPOuZTxpd8uRx0Rv3LrrmFEcGPHaMNQ2WiXAEJG6OaMTBtwKiynEFH3DU5Rx2WP9M98bH-emC_w7Zq1xKaCOsj2t09F00KohcGC49zSPgPVpp_TwF1qt6_0d0Mnh_Eqi_NHpobVvO85ZOLS05AyW9LQyA5A"
+	vecosyCl, err := vecosy.NewBuilder("localhost:8081", "app1", "1.0.0", "dev").WithJWSToken(jwsToken).WithTLS(trustCert).Build(nil)
 	panicOnError(err)
 	err = vecosyCl.WatchChanges()
 	panicOnError(err)
