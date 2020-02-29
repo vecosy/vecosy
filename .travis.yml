@@ -3,14 +3,16 @@ language: go
 go:
   - 1.13.x
 
-env:
-  - CODECOV_TOKEN="de107f56-343c-401e-b84d-5599eadc48a9"
+before_script:
+  - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash"
 
 before_install:
   - go get -t -v ./...
 
 script:
   - go test -v ./... --tags integration -coverprofile=coverage.txt -covermode=atomic
+  - fossa init
+  - fossa analyze
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

@@ -1,23 +1,19 @@
-
-# Product Versioned Configuration System
+# Centralized Configuration System
 [![Build Status](https://travis-ci.com/vecosy/vecosy.svg)](https://travis-ci.com/vecosy/vecosy)
 [![codecov](https://codecov.io/gh/vecosy/vecosy/branch/develop/graph/badge.svg)](https://codecov.io/gh/vecosy/vecosy)
 [![Build Status](https://img.shields.io/badge/docker-pull%20vecosy%2Fvecosy%3Adev-blue)](https://hub.docker.com/repository/docker/vecosy/vecosy)
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/vecosy/community)
 ![GitHub](https://img.shields.io/github/license/vecosy/vecosy)
-
-**vecosy** is a centralized configuration system
-
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvecosy%2Fvecosy.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvecosy%2Fvecosy?ref=badge_shield)
 
 ![](./docs/schema.png)
 
 ## Features
-* confiurable by a GIT repo
+* configurable by a GIT repo
 * GRPC
 * Spring cloud configuration compatible
 * REST
 * Auto update (currently only with golang client)
-* K8s ready by [HELM](https://github.com/vecosy/helm)
 
 # Configuration Repo
 
@@ -138,6 +134,13 @@ The server has to be started with `--insecure` option
     vecosyCl.WatchChanges()
 ```
 This will maintain a GRPC connection with the server that will inform the client on every configuration changes on the git repo.
+
+It's also possible to add handlers to react to the changes
+```
+    vecosyCl.AddOnChangeHandler(func() {
+        fmt.Println("something has changed")
+    })
+```
 
 ## More info
 have a look to the [integration test](https://github.com/vecosy/vecosy/blob/develop/pkg/vecosy/init_integration_test.go) for more details
@@ -311,8 +314,9 @@ func panicOnError(err error) {
 ## Spring Client
 Take a look to [spring-boot-example](https://github.com/vecosy/spring-boot-example)
 
-## Call Endpoints
-Add the `Authorization` header with the token generated before `Bearer [token]`
+## Endpoints
+Remember to add the `Authorization` header with the token generated before `Bearer [token]` 
+(except if the server has been started with `--insecure` option)
 
 ### SmartConfig Strategies
 from [app1/1.0.0](https://github.com/vecosy/config-sample/tree/app1/1.0.0)
@@ -339,3 +343,9 @@ for [spring-app1/1.0.0](https://github.com/vecosy/config-sample/tree/spring-app1
 * metrics
 * different config repo type (etcd, redis,...)
 * improving spring compatibility (watch changes doesn't work right now)
+## Work in progress
+Kubernetes helm chart https://github.com/vecosy/helm
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvecosy%2Fvecosy.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvecosy%2Fvecosy?ref=badge_large)
