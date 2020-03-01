@@ -2,7 +2,9 @@
 [![Build Status](https://travis-ci.com/vecosy/vecosy.svg)](https://travis-ci.com/vecosy/vecosy)
 [![codecov](https://codecov.io/gh/vecosy/vecosy/branch/develop/graph/badge.svg)](https://codecov.io/gh/vecosy/vecosy)
 [![Build Status](https://img.shields.io/badge/docker-pull%20vecosy%2Fvecosy%3Adev-blue)](https://hub.docker.com/repository/docker/vecosy/vecosy)
+[![Go Report Card](https://goreportcard.com/badge/github.com/vecosy/vecosy)](https://goreportcard.com/report/github.com/vecosy/vecosy)
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/vecosy/community)
+
 ![GitHub](https://img.shields.io/github/license/vecosy/vecosy)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvecosy%2Fvecosy.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvecosy%2Fvecosy?ref=badge_shield)
 
@@ -143,7 +145,7 @@ It's also possible to add handlers to react to the changes
 ```
 
 ## More info
-have a look to the [integration test](https://github.com/vecosy/vecosy/blob/develop/pkg/vecosy/init_integration_test.go) for more details
+have a look to the [integration test](https://github.com/vecosy/vecosy/blob/develop/pkg/vecosy/client_integration_test.go) for more details
 
 # Server Configuration
 *some configuration options can be passed via command line run `vecosy-server --help` for the options*
@@ -247,6 +249,7 @@ repo:
 The demo uses the [config-sample](https://github.com/vecosy/config-sample) repository
 ## Run the server
 ```shell script
+$> docker pull vecosy/vecosy:demo
 $> docker run --rm  -p 8080:8080 -p 8081:8081 vecosy/vecosy:demo
 ```
 

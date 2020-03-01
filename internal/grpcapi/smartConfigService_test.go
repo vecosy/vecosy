@@ -46,7 +46,7 @@ func TestServer_GetConfig(t *testing.T) {
 			}
 			ctx := context.Background()
 			if security {
-				ctx = applySecurityIn(t, privKey, ctx, mockRepo, app.AppName, app.AppVersion)
+				ctx = applySecurityIn(ctx, t, privKey, mockRepo, app.AppName, app.AppVersion)
 			}
 			response, err := srv.GetConfig(ctx, request)
 			check.NoError(err)
@@ -78,7 +78,7 @@ func TestServer_GetConfig_NotFound(t *testing.T) {
 			app := configrepo.NewApplicationVersion("app", "1.0.0")
 			env := "dev"
 
-			mockRepo.EXPECT().GetFile(app, "config.yml").Return(nil, configrepo.ApplicationNotFoundError)
+			mockRepo.EXPECT().GetFile(app, "config.yml").Return(nil, configrepo.ErrApplicationNotFound)
 			request := &GetConfigRequest{
 				AppName:     app.AppName,
 				AppVersion:  app.AppVersion,
@@ -86,10 +86,10 @@ func TestServer_GetConfig_NotFound(t *testing.T) {
 			}
 			ctx := context.Background()
 			if security {
-				ctx = applySecurityIn(t, privKey, ctx, mockRepo, app.AppName, app.AppVersion)
+				ctx = applySecurityIn(ctx, t, privKey, mockRepo, app.AppName, app.AppVersion)
 			}
 			response, err := srv.GetConfig(ctx, request)
-			check.EqualError(err, configrepo.ApplicationNotFoundError.Error())
+			check.EqualError(err, configrepo.ErrApplicationNotFound.Error())
 			check.Nil(response)
 		})
 	}
@@ -122,7 +122,7 @@ func TestServer_GetConfig_Unauthorized(t *testing.T) {
 	prepareSecurityMock(app.AppName, app.AppVersion, mockRepo, privKey)
 
 	response, err := srv.GetConfig(ctx, request)
-	check.Equal(err, security.AuthFailed)
+	check.Equal(err, security.ErrAuthFailed)
 	check.Nil(response)
 }
 
@@ -142,7 +142,7 @@ func TestServer_GetConfig_InvalidApp(t *testing.T) {
 		Environment: "dev",
 	}
 	response, err := srv.GetConfig(context.Background(), badAppNameRequest)
-	check.Equal(err, validation.InvalidApplicationName)
+	check.Equal(err, validation.ErrInvalidApplicationName)
 	check.Nil(response)
 
 	badAppVersionRequest := &GetConfigRequest{
@@ -151,6 +151,6 @@ func TestServer_GetConfig_InvalidApp(t *testing.T) {
 		Environment: "dev",
 	}
 	response, err = srv.GetConfig(context.Background(), badAppVersionRequest)
-	check.Equal(err, validation.InvalidVersion)
+	check.Equal(err, validation.ErrInvalidVersion)
 	check.Nil(response)
 }

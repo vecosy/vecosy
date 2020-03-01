@@ -1,13 +1,16 @@
 package restapi
 
 import (
-	"github.com/kataras/iris"
+	"github.com/kataras/iris/v12"
 	"github.com/sirupsen/logrus"
 	"github.com/vecosy/vecosy/v2/internal/security"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"strings"
 )
 
+// CheckToken check if a valid auth token is present on the request
+//
+// http headers: Authorization and X-Config-Token
 func (s *Server) CheckToken(ctx iris.Context, app *configrepo.ApplicationVersion) error {
 	log := logrus.WithField("method", "CheckToken")
 	if !s.IsSecurityEnabled() {

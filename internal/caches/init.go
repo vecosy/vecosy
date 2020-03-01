@@ -5,6 +5,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// KeyCache contains the application public keys cache
 var KeyCache keyCache
 
 func init() {

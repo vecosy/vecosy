@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
-	"github.com/kataras/iris/httptest"
+	"github.com/kataras/iris/v12/httptest"
 	"github.com/stretchr/testify/assert"
 	"github.com/vecosy/vecosy/v2/internal/utils"
 	"github.com/vecosy/vecosy/v2/mocks"
@@ -67,7 +67,7 @@ func TestServer_GetFile(t *testing.T) {
 			if security {
 				applySecurity(t, privKey, req, repo, app)
 			}
-			repo.EXPECT().GetFile(app, filePath).Return(nil, configrepo.FileNotFoundError)
+			repo.EXPECT().GetFile(app, filePath).Return(nil, configrepo.ErrFileNotFound)
 			fileReq.Expect().Status(httptest.StatusNotFound)
 		})
 

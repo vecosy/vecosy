@@ -17,6 +17,7 @@ import (
 	"time"
 )
 
+// BytesToPublicKey TEST ONLY:parse a byteArray to a rsa.PublicKey
 func BytesToPublicKey(pub []byte) (*rsa.PublicKey, error) {
 	block, _ := pem.Decode(pub)
 	enc := x509.IsEncryptedPEMBlock(block)
@@ -40,6 +41,7 @@ func BytesToPublicKey(pub []byte) (*rsa.PublicKey, error) {
 	return key, nil
 }
 
+// PublicKeyToBytes TEST ONLY:marshall an rsa.PublicKey to an array of bytes
 func PublicKeyToBytes(pub *rsa.PublicKey) []byte {
 	pubASN1, err := x509.MarshalPKIXPublicKey(pub)
 	if err != nil {
@@ -54,6 +56,7 @@ func PublicKeyToBytes(pub *rsa.PublicKey) []byte {
 	return pubBytes
 }
 
+// GenerateKeyPair TEST ONLY: generate a new RSA key pairs
 func GenerateKeyPair() (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	privKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
@@ -62,6 +65,7 @@ func GenerateKeyPair() (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	return privKey, &privKey.PublicKey, nil
 }
 
+// GenJwsFromPrivateKey TEST ONLY: generate a new JWS token signed by a privKey
 func GenJwsFromPrivateKey(t *testing.T, privKey *rsa.PrivateKey, appName string) *jose.JSONWebSignature {
 	signer, err := jose.NewSigner(jose.SigningKey{Algorithm: jose.PS512, Key: privKey}, nil)
 	assert.NoError(t, err)
@@ -70,6 +74,7 @@ func GenJwsFromPrivateKey(t *testing.T, privKey *rsa.PrivateKey, appName string)
 	return jws
 }
 
+// GenerateCertificate will generate a test certificate
 func GenerateCertificate() ([]byte, []byte, error) {
 	privKey, pubKey, err := GenerateKeyPair()
 	if err != nil {
@@ -113,8 +118,12 @@ func GenerateCertificate() ([]byte, []byte, error) {
 	return pemCert, pemPrivKey, nil
 }
 
+// GenerateCertificateFiles TEST ONLY: will generate a test certificate/priv key and store it on files
 func GenerateCertificateFiles() (string, string, error) {
 	cert, certKey, err := GenerateCertificate()
+	if err != nil {
+		return "", "", err
+	}
 	certFile, err := ioutil.TempFile("", "cert")
 	if err != nil {
 		return "", "", err

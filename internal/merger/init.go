@@ -8,6 +8,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// ConfigMerger represent a merge configuration strategy
 type ConfigMerger interface {
 	Merge(repo configrepo.Repo, appName, appVersion string, profiles []string) (map[interface{}]interface{}, error)
 }
@@ -17,7 +18,7 @@ func mergeFiles(repo configrepo.Repo, app *configrepo.ApplicationVersion, appCon
 	for _, configFilePath := range appConfigFiles {
 		profileFile, err := repo.GetFile(app, configFilePath)
 		if err != nil {
-			if err == configrepo.ApplicationNotFoundError {
+			if err == configrepo.ErrApplicationNotFound {
 				return nil, err
 			}
 			logrus.Warnf("Error getting file:%s, err:%s", configFilePath, err)

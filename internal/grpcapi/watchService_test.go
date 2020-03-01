@@ -46,9 +46,10 @@ func TestServer_Watch(t *testing.T) {
 				Application: app,
 			}
 			stream := NewMockWatchService_WatchServer(ctrl)
-			streamCtx, _ := context.WithTimeout(context.Background(), 1*time.Second)
+			streamCtx, cancelFn := context.WithTimeout(context.Background(), 1*time.Second)
+			defer cancelFn()
 			if security {
-				streamCtx = applySecurityIn(t, privKey, streamCtx, mockRepo, app.AppName, app.AppVersion)
+				streamCtx = applySecurityIn(streamCtx, t, privKey, mockRepo, app.AppName, app.AppVersion)
 			}
 			stream.EXPECT().Context().AnyTimes().Return(streamCtx)
 			err = srv.Watch(request, stream)
@@ -86,13 +87,14 @@ func TestServer_Watch_Unauthorized(t *testing.T) {
 		Application: app,
 	}
 	stream := NewMockWatchService_WatchServer(ctrl)
-	streamCtx, _ := context.WithTimeout(context.Background(), 1*time.Second)
+	streamCtx, cancelFn := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancelFn()
 	md := metadata.MD{"token": []string{utils.GenJwsFromPrivateKey(t, privKeyWrong, "TestApp").FullSerialize()}}
 	streamCtx = metadata.NewIncomingContext(streamCtx, md)
 	prepareSecurityMock(app.AppName, app.AppVersion, mockRepo, privKey)
 	stream.EXPECT().Context().AnyTimes().Return(streamCtx)
 	err = srv.Watch(request, stream)
-	check.Equal(err, security.AuthFailed)
+	check.Equal(err, security.ErrAuthFailed)
 }
 
 func TestServer_Watch_InvalidApplication(t *testing.T) {
@@ -114,7 +116,7 @@ func TestServer_Watch_InvalidApplication(t *testing.T) {
 	}
 	stream := NewMockWatchService_WatchServer(ctrl)
 	err = srv.Watch(badAppNameRequest, stream)
-	check.Equal(err, validation.InvalidApplicationName)
+	check.Equal(err, validation.ErrInvalidApplicationName)
 
 	badAppVersionRequest := &WatchRequest{
 		WatcherName: "test",
@@ -125,5 +127,5 @@ func TestServer_Watch_InvalidApplication(t *testing.T) {
 	}
 	stream = NewMockWatchService_WatchServer(ctrl)
 	err = srv.Watch(badAppVersionRequest, stream)
-	check.Equal(err, validation.InvalidVersion)
+	check.Equal(err, validation.ErrInvalidVersion)
 }

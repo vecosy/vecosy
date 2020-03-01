@@ -3,7 +3,7 @@ package restapi
 import (
 	"github.com/golang/mock/gomock"
 	"github.com/hashicorp/go-version"
-	"github.com/kataras/iris/httptest"
+	"github.com/kataras/iris/v12/httptest"
 	"github.com/vecosy/vecosy/v2/mocks"
 	"testing"
 )

@@ -4,7 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
-	"github.com/vecosy/vecosy/v2/pkg/configrepo/configGitRepo"
+	"github.com/vecosy/vecosy/v2/pkg/configrepo/gitconfigrepo"
 	ssh2 "golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing/transport"
@@ -16,18 +16,18 @@ import (
 )
 
 func initRepo() configrepo.Repo {
-	repoUrl := viper.GetString("repo.remote.url")
-	if strings.Contains(repoUrl, "file://") {
-		repoPath := strings.Replace(repoUrl, "file://", "", 1)
+	repoURL := viper.GetString("repo.remote.url")
+	if strings.Contains(repoURL, "file://") {
+		repoPath := strings.Replace(repoURL, "file://", "", 1)
 		if !path.IsAbs(repoPath) {
-			repoUrl, _ = filepath.Abs(repoPath)
+			repoURL, _ = filepath.Abs(repoPath)
 		}
 	}
 	auth, err := getAuth()
 	if err != nil {
 		logrus.Fatalf("error initializing repo auth:%s", err)
 	}
-	cfgRepo, err := configGitRepo.NewConfigRepo(viper.GetString("repo.local.path"), &git.CloneOptions{URL: repoUrl, Auth: auth})
+	cfgRepo, err := gitconfigrepo.NewGitConfigRepo(viper.GetString("repo.local.path"), &git.CloneOptions{URL: repoURL, Auth: auth})
 	if err != nil {
 		logrus.Fatalf("error initializing repo:%s", err)
 	}

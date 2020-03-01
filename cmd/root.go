@@ -44,6 +44,7 @@ func failOnError(err error) {
 	}
 }
 
+// Execute the rootCommand
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		logrus.Fatal(err)

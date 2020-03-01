@@ -1,4 +1,4 @@
-package configGitRepo
+package gitconfigrepo
 
 import (
 	"fmt"
@@ -22,8 +22,9 @@ var testBasicPath = fmt.Sprintf("%s/vecosy_tests", os.TempDir())
 
 func TestMain(m *testing.M) {
 	logrus.SetLevel(logrus.DebugLevel)
-	m.Run()
+	retCode := m.Run()
 	_ = os.RemoveAll(testBasicPath)
+	os.Exit(retCode)
 }
 
 func InitRepos(t *testing.T) (string, string) {

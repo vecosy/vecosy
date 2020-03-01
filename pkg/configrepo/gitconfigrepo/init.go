@@ -1,4 +1,4 @@
-package configGitRepo
+package gitconfigrepo
 
 import (
 	"github.com/hashicorp/go-version"
@@ -20,8 +20,10 @@ func newApp(name string) *app {
 	return &app{name, make(map[string]*plumbing.Reference), make([]*version.Version, 0)}
 }
 
+// ErrorHandlerFn represent an error handler function
 type ErrorHandlerFn func(err error)
 
+// GitConfigRepo represent a git configuration repository
 type GitConfigRepo struct {
 	repo            *git.Repository
 	Apps            map[string]*app
@@ -34,7 +36,8 @@ type GitConfigRepo struct {
 	changesHandlers []configrepo.OnChangeHandler
 }
 
-func NewConfigRepo(localPath string, cloneOpts *git.CloneOptions) (configrepo.Repo, error) {
+// NewGitConfigRepo instantiate a new GIT configuration repository
+func NewGitConfigRepo(localPath string, cloneOpts *git.CloneOptions) (configrepo.Repo, error) {
 	log := logrus.WithField("localPath", localPath)
 	log.Info("New Config Repo")
 	repo, err := git.PlainOpen(localPath)
@@ -63,12 +66,14 @@ func NewConfigRepo(localPath string, cloneOpts *git.CloneOptions) (configrepo.Re
 	}, nil
 }
 
+// Init initialize the git repository
 func (cr *GitConfigRepo) Init() (err error) {
 	cr.errorHandlerManager()
 	cr.Apps, err = cr.loadApps()
 	return
 }
 
+// GetAppsVersions returns a appName-> list of version
 func (cr *GitConfigRepo) GetAppsVersions() map[string][]*version.Version {
 	result := make(map[string][]*version.Version)
 	for app, branch := range cr.Apps {
@@ -77,6 +82,7 @@ func (cr *GitConfigRepo) GetAppsVersions() map[string][]*version.Version {
 	return result
 }
 
+// AddOnChangeHandler add a new change handler to the git repo
 func (cr *GitConfigRepo) AddOnChangeHandler(handler configrepo.OnChangeHandler) {
 	cr.changesHandlers = append(cr.changesHandlers, handler)
 }

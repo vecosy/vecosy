@@ -6,12 +6,13 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/jeremywohl/flatten"
-	"github.com/kataras/iris/httptest"
+	"github.com/kataras/iris/v12/httptest"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/vecosy/vecosy/v2/internal/utils"
 	"github.com/vecosy/vecosy/v2/mocks"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
+	"os"
 	"strings"
 	"testing"
 )
@@ -19,7 +20,7 @@ import (
 func TestMain(m *testing.M) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetReportCaller(true)
-	m.Run()
+	os.Exit(m.Run())
 }
 
 func Test_extractAppNameAndVersion(t *testing.T) {

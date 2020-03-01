@@ -7,6 +7,7 @@ import (
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 )
 
+// GetFile returns a raw file on the repo
 func (s *Server) GetFile(ctx context.Context, request *GetFileRequest) (*GetFileResponse, error) {
 	log := logrus.WithField("method", "GetFile").WithField("request", request)
 	appVersion := configrepo.NewApplicationVersion(request.AppName, request.AppVersion)

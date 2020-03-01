@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
+// Builder represent a client initialization builder
 type Builder struct {
 	vecosyServer         string
 	appName              string
@@ -22,6 +23,7 @@ type Builder struct {
 	serverDomainOverride string
 }
 
+// NewBuilder create a new Builder instance
 func NewBuilder(vecosyServer, appName, appVersion, environment string) *Builder {
 	return &Builder{
 		vecosyServer: vecosyServer,
@@ -31,29 +33,34 @@ func NewBuilder(vecosyServer, appName, appVersion, environment string) *Builder 
 	}
 }
 
+// WithJWSToken enables the JWS authentication
 func (b *Builder) WithJWSToken(jwsToken string) *Builder {
 	b.insecure = false
 	b.jwsToken = jwsToken
 	return b
 }
 
+// Insecure disable the JWS authentication
 func (b *Builder) Insecure() *Builder {
 	b.insecure = true
 	b.jwsToken = ""
 	return b
 }
 
+// WithTLS enable the TLS
 func (b *Builder) WithTLS(certFile string) *Builder {
 	b.tls = true
 	b.certFile = certFile
 	return b
 }
 
+// WithDomainOverride TEST ONLY: override the TLS server domain validation
 func (b *Builder) WithDomainOverride(serverDomainOverride string) *Builder {
 	b.serverDomainOverride = serverDomainOverride
 	return b
 }
 
+// Build will generate a new vecosy client configuration
 func (b *Builder) Build(conf *viper.Viper) (*Client, error) {
 	var err error
 	vecosyCl := &Client{AppName: b.appName, AppVersion: b.appVersion, Environment: b.environment, jwsToken: b.jwsToken, onChangeHandlers: make([]OnChangeHandler, 0)}

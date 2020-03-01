@@ -1,4 +1,4 @@
-package configGitRepo
+package gitconfigrepo
 
 import (
 	"fmt"
@@ -9,10 +9,11 @@ import (
 	"io/ioutil"
 )
 
+// GetNearestBranch retrieve the nearest (<=) application version available on the git repo
 func (cr *GitConfigRepo) GetNearestBranch(targetApp *configrepo.ApplicationVersion) (*plumbing.Reference, error) {
 	app, appFound := cr.Apps[targetApp.AppName]
 	if !appFound {
-		return nil, configrepo.ApplicationNotFoundError
+		return nil, configrepo.ErrApplicationNotFound
 	}
 	constraint, err := version.NewConstraint(fmt.Sprintf("<=%s", targetApp.AppVersion))
 	if err != nil {
@@ -26,6 +27,7 @@ func (cr *GitConfigRepo) GetNearestBranch(targetApp *configrepo.ApplicationVersi
 	return nil, fmt.Errorf("no branch found for target chkVer:%s", targetApp.AppVersion)
 }
 
+// GetFile retrieve a file from the git repo
 func (cr *GitConfigRepo) GetFile(targetApp *configrepo.ApplicationVersion, path string) (*configrepo.RepoFile, error) {
 	log := logrus.WithField("method", "GetFile").WithField("targetApp", targetApp).WithField("path", path)
 	branchRef, err := cr.GetNearestBranch(targetApp)

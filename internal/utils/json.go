@@ -6,6 +6,7 @@ import (
 	"strconv"
 )
 
+// NormalizeMap convert a map[interface{}]interface{} to a map[string]interface{}
 func NormalizeMap(mp map[interface{}]interface{}) (map[string]interface{}, error) {
 	var err error
 	strMap := make(map[string]interface{})

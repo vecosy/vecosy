@@ -1,3 +1,5 @@
+fixes:
+  - "v2/::"
 ignore:
   - "**/*.pb.go"
   - "**/*mock*"

@@ -5,15 +5,19 @@ import (
 	"time"
 )
 
+// RepoFile represent a repository file
 type RepoFile struct {
 	Version string
 	Content []byte
 }
+
+// ApplicationVersion represent the couple name+version
 type ApplicationVersion struct {
 	AppName    string
 	AppVersion string
 }
 
+// NewApplicationVersion create a new ApplicationVersion (name+version) instance
 func NewApplicationVersion(name, version string) *ApplicationVersion {
 	return &ApplicationVersion{
 		AppName:    name,
@@ -21,8 +25,10 @@ func NewApplicationVersion(name, version string) *ApplicationVersion {
 	}
 }
 
+// OnChangeHandler function handler executed on every repo changes
 type OnChangeHandler func(changedApplication ApplicationVersion)
 
+// Repo represent a config repository
 type Repo interface {
 	Init() error
 	GetAppsVersions() map[string][]*version.Version

@@ -2,8 +2,8 @@ package restapi
 
 import (
 	"github.com/jeremywohl/flatten"
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/core/router"
+	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/core/router"
 	"github.com/sirupsen/logrus"
 	"github.com/vecosy/vecosy/v2/internal/merger"
 	"github.com/vecosy/vecosy/v2/internal/utils"
@@ -133,22 +133,22 @@ func (s *Server) getPropertySource(app *configrepo.ApplicationVersion, configFil
 	if err != nil {
 		logrus.Errorf("Error parsing yml file:%s, err:%s", configFilePath, err)
 		return nil, err
-	} else {
-		configMap, err := utils.NormalizeMap(config)
-		if err != nil {
-			logrus.Errorf("Error normalizing json map:%#+vs, err:%s", config, err)
-			return nil, err
-		}
-
-		flattenMap, err := flatten.Flatten(configMap, "", flatten.DotStyle)
-		if err != nil {
-			logrus.Errorf("Error flattering json map:%#+vs, err:%s", config, err)
-			return nil, err
-		}
-
-		resource := &propertySources{Name: configFilePath, Source: flattenMap, version: profileFile.Version}
-		return resource, nil
 	}
+	configMap, err := utils.NormalizeMap(config)
+	if err != nil {
+		logrus.Errorf("Error normalizing json map:%#+vs, err:%s", config, err)
+		return nil, err
+	}
+
+	flattenMap, err := flatten.Flatten(configMap, "", flatten.DotStyle)
+	if err != nil {
+		logrus.Errorf("Error flattering json map:%#+vs, err:%s", config, err)
+		return nil, err
+	}
+
+	resource := &propertySources{Name: configFilePath, Source: flattenMap, version: profileFile.Version}
+	return resource, nil
+
 }
 
 var appProfileRe = regexp.MustCompile("([a-z|A-Z|0-9|.]*)*-?")
@@ -159,19 +159,19 @@ var appProfileRe = regexp.MustCompile("([a-z|A-Z|0-9|.]*)*-?")
 func extractAppNameAndVersion(appAndProfile string) (string, string, string) {
 	values := appProfileRe.FindAllStringSubmatch(appAndProfile, -1)
 	logrus.Debugf("values %+v", values)
+	var appName, ext, profile string
 	if len(values) > 1 {
 		appParts := make([]string, len(values)-1)
 		for i := 0; i < len(values)-1; i++ {
 			appParts[i] = values[i][1]
 		}
-		appName := strings.Join(appParts, "-")
+		appName = strings.Join(appParts, "-")
 		profileAndExtension := values[len(values)-1][1]
-		ext := path.Ext(profileAndExtension)
-		profile := strings.Replace(profileAndExtension, ext, "", 1)
-		return appName, ext, profile
+		ext = path.Ext(profileAndExtension)
+		profile = strings.Replace(profileAndExtension, ext, "", 1)
 	} else {
-		ext := path.Ext(appAndProfile)
-		appName := strings.Replace(appAndProfile, ext, "", 1)
-		return appName, ext, ""
+		ext = path.Ext(appAndProfile)
+		appName = strings.Replace(appAndProfile, ext, "", 1)
 	}
+	return appName, ext, profile
 }

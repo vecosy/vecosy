@@ -2,7 +2,7 @@ package restapi
 
 import (
 	"fmt"
-	"github.com/kataras/iris"
+	"github.com/kataras/iris/v12"
 	"github.com/sirupsen/logrus"
 	"github.com/vecosy/vecosy/v2/internal/validation"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
@@ -17,11 +17,8 @@ func internalServerError(ctx iris.Context) {
 func badRequest(ctx iris.Context, err string) {
 	ctx.StatusCode(http.StatusBadRequest)
 	if err != "" {
-		ctx.WriteString(err)
+		_, _ = ctx.WriteString(err)
 	}
-}
-func serviceUnavailableResponse(ctx iris.Context) {
-	ctx.StatusCode(http.StatusServiceUnavailable)
 }
 
 func notFoundResponse(ctx iris.Context) {
@@ -30,14 +27,6 @@ func notFoundResponse(ctx iris.Context) {
 
 func unAuthorizedResponse(ctx iris.Context) {
 	ctx.StatusCode(http.StatusUnauthorized)
-}
-
-func forbiddenResponse(ctx iris.Context) {
-	ctx.StatusCode(http.StatusForbidden)
-}
-
-func noContentResponse(ctx iris.Context) {
-	ctx.StatusCode(http.StatusNoContent)
 }
 
 func getAccepts(ctx iris.Context) map[string]bool {

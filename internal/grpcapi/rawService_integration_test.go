@@ -10,12 +10,13 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"google.golang.org/grpc"
+	"os"
 	"testing"
 )
 
 func TestMain(m *testing.M) {
 	logrus.SetLevel(logrus.DebugLevel)
-	m.Run()
+	os.Exit(m.Run())
 }
 
 func TestServer_GetFile_IT(t *testing.T) {

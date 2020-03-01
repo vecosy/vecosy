@@ -1,8 +1,8 @@
 package restapi
 
 import (
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/context"
+	"github.com/kataras/iris/v12"
+	"github.com/kataras/iris/v12/context"
 	"github.com/sirupsen/logrus"
 	"github.com/vecosy/vecosy/v2/internal/merger"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
@@ -11,12 +11,12 @@ import (
 var smartConfigFileMerger = merger.SmartConfigMerger{}
 
 func (s *Server) registerSmartConfigEndpoints(parent iris.Party) {
-	configApi := parent.Party("/config")
-	configApi.Get("/", s.Info)
-	configApi.Get("/{appName:string}/{appVersion:string}/{profile:string}", s.GetSmartConfig)
+	configAPI := parent.Party("/config")
+	configAPI.Get("/", s.info)
+	configAPI.Get("/{appName:string}/{appVersion:string}/{profile:string}", s.getSmartConfig)
 }
 
-func (s *Server) GetSmartConfig(ctx iris.Context) {
+func (s *Server) getSmartConfig(ctx iris.Context) {
 	appName := ctx.Params().GetString("appName")
 	appVersion := ctx.Params().GetString("appVersion")
 	profile := ctx.Params().GetString("profile")

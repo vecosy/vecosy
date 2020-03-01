@@ -5,8 +5,10 @@ import (
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 )
 
+// SmartConfigMerger represent a ConfigMerger for smart config strategy
 type SmartConfigMerger struct{}
 
+// Merge the application configuration following the smart config strategy
 func (s SmartConfigMerger) Merge(repo configrepo.Repo, app *configrepo.ApplicationVersion, profiles []string) (map[interface{}]interface{}, error) {
 	appConfigFiles := getSmartConfigApplicationFilePaths(app.AppName, profiles)
 	return mergeFiles(repo, app, appConfigFiles)

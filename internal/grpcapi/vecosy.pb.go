@@ -481,7 +481,7 @@ func NewRawClient(cc *grpc.ClientConn) RawClient {
 
 func (c *rawClient) GetFile(ctx context.Context, in *GetFileRequest, opts ...grpc.CallOption) (*GetFileResponse, error) {
 	out := new(GetFileResponse)
-	err := c.cc.Invoke(ctx, "/grpcapi.Raw/GetFile", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/grpcapi.Raw/getFile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -498,7 +498,7 @@ type UnimplementedRawServer struct {
 }
 
 func (*UnimplementedRawServer) GetFile(ctx context.Context, req *GetFileRequest) (*GetFileResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFile not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method getFile not implemented")
 }
 
 func RegisterRawServer(s *grpc.Server, srv RawServer) {
@@ -515,7 +515,7 @@ func _Raw_GetFile_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpcapi.Raw/GetFile",
+		FullMethod: "/grpcapi.Raw/getFile",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RawServer).GetFile(ctx, req.(*GetFileRequest))
@@ -528,7 +528,7 @@ var _Raw_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*RawServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetFile",
+			MethodName: "getFile",
 			Handler:    _Raw_GetFile_Handler,
 		},
 	},

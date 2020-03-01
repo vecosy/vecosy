@@ -1,7 +1,7 @@
 package restapi
 
 import (
-	"github.com/kataras/iris"
+	"github.com/kataras/iris/v12"
 	"github.com/sirupsen/logrus"
 	"github.com/vecosy/vecosy/v2/internal/utils"
 )
@@ -15,7 +15,8 @@ func respondConfig(ctx iris.Context, finalConfig map[interface{}]interface{}, ex
 	case ".yml", ".yaml":
 		_, err = ctx.YAML(finalConfig)
 	case ".json":
-		normalizedMap, err := utils.NormalizeMap(finalConfig)
+		var normalizedMap map[string]interface{}
+		normalizedMap, err = utils.NormalizeMap(finalConfig)
 		if err != nil {
 			log.Errorf("Error normalizing json map:%#+vs, err:%s", finalConfig, err)
 			internalServerError(ctx)

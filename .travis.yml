@@ -3,16 +3,11 @@ language: go
 go:
   - 1.13.x
 
-before_script:
-  - "curl -H 'Cache-Control: no-cache' https://raw.githubusercontent.com/fossas/fossa-cli/master/install.sh | sudo bash"
-
 before_install:
   - go get -t -v ./...
 
 script:
   - go test -v ./... --tags integration -coverprofile=coverage.txt -covermode=atomic
-  - fossa init
-  - fossa analyze
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)

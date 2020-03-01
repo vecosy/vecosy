@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/vecosy/vecosy/v2/internal/grpcapi"
 	"io"
+	"os"
 	"testing"
 	"time"
 )
@@ -18,7 +19,7 @@ import (
 func TestMain(m *testing.M) {
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetReportCaller(true)
-	m.Run()
+	os.Exit(m.Run())
 }
 
 func TestClient_UpdateConfig(t *testing.T) {

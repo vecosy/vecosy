@@ -1,4 +1,4 @@
-package configGitRepo
+package gitconfigrepo
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -9,7 +9,7 @@ import (
 
 func TestConfigRepo_GetNearestBranch_FullMatch(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	cfgRepo, err := NewGitConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
@@ -22,7 +22,7 @@ func TestConfigRepo_GetNearestBranch_FullMatch(t *testing.T) {
 
 func TestConfigRepo_GetNearestBranch_Between(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	cfgRepo, err := NewGitConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
@@ -35,7 +35,7 @@ func TestConfigRepo_GetNearestBranch_Between(t *testing.T) {
 
 func TestConfigRepo_GetNearestBranch_Over(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	cfgRepo, err := NewGitConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
@@ -48,7 +48,7 @@ func TestConfigRepo_GetNearestBranch_Over(t *testing.T) {
 
 func TestConfigRepo_GetNearestBranch_NotFound(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	cfgRepo, err := NewGitConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
@@ -61,7 +61,7 @@ func TestConfigRepo_GetNearestBranch_NotFound(t *testing.T) {
 
 func TestConfigRepo_GetFile(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	cfgRepo, err := NewGitConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
@@ -86,7 +86,7 @@ func TestConfigRepo_GetFile(t *testing.T) {
 
 func TestConfigRepo_GetNearestBranch_AppNotFound(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	cfgRepo, err := NewGitConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
@@ -97,7 +97,7 @@ func TestConfigRepo_GetNearestBranch_AppNotFound(t *testing.T) {
 
 func TestConfigRepo_GetFile_AppNotFound(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	cfgRepo, err := NewGitConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())

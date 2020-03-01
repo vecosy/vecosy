@@ -8,6 +8,7 @@ import (
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 )
 
+// Watch manage a GRPC watch request
 func (s *Server) Watch(request *WatchRequest, stream WatchService_WatchServer) error {
 	log := logrus.WithField("method", "Watch").WithField("request", request)
 	log.Infof("add Watcher")

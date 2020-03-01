@@ -12,6 +12,7 @@ import (
 
 var smartConfigFileMerger = merger.SmartConfigMerger{}
 
+// GetConfig returns the merged configuration based on smartconfig strategies
 func (s *Server) GetConfig(ctx context.Context, request *GetConfigRequest) (*GetConfigResponse, error) {
 	log := logrus.WithField("method", "GRPC:GetConfig").WithField("request", request)
 	log.Infof("GetConfig")

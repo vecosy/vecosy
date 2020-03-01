@@ -1,4 +1,4 @@
-package configGitRepo
+package gitconfigrepo
 
 import (
 	"github.com/hashicorp/go-version"
@@ -10,7 +10,7 @@ import (
 	"sort"
 )
 
-var appRe = regexp.MustCompile(".*/([a-z|A-Z|0-9|\\-|.]*)/([a-z|A-Z|0-9|\\-|.]*)")
+var appRe = regexp.MustCompile(`.*/([a-z|A-Z|0-9|\-|.]*)/([a-z|A-Z|0-9|\-|.]*)`)
 
 func addApp(branchRef *plumbing.Reference, apps map[string]*app) error {
 	logrus.Debugf("analyzing reference :%s", branchRef.Name())

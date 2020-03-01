@@ -3,8 +3,8 @@ package restapi
 import (
 	"crypto/rsa"
 	"fmt"
+	"github.com/gavv/httpexpect"
 	"github.com/google/uuid"
-	"github.com/iris-contrib/httpexpect"
 	"github.com/stretchr/testify/assert"
 	"github.com/vecosy/vecosy/v2/internal/utils"
 	"github.com/vecosy/vecosy/v2/mocks"

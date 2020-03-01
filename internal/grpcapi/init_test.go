@@ -34,13 +34,13 @@ func StartGRPCServerIT(ctrl *gomock.Controller, t *testing.T, security bool) (*m
 }
 
 // used on the integration tests
-func applySecurityOut(t *testing.T, privKey *rsa.PrivateKey, ctx context.Context, repo *mocks.MockRepo, appName, appVersion string) context.Context {
+func applySecurityOut(ctx context.Context, t *testing.T, privKey *rsa.PrivateKey, repo *mocks.MockRepo, appName, appVersion string) context.Context {
 	prepareSecurityMock(appName, appVersion, repo, privKey)
 	return metadata.AppendToOutgoingContext(ctx, "token", utils.GenJwsFromPrivateKey(t, privKey, "TestApp").FullSerialize())
 }
 
 // used on the unit tests
-func applySecurityIn(t *testing.T, privKey *rsa.PrivateKey, ctx context.Context, repo *mocks.MockRepo, appName, appVersion string) context.Context {
+func applySecurityIn(ctx context.Context, t *testing.T, privKey *rsa.PrivateKey, repo *mocks.MockRepo, appName, appVersion string) context.Context {
 	prepareSecurityMock(appName, appVersion, repo, privKey)
 	md := metadata.MD{"token": []string{utils.GenJwsFromPrivateKey(t, privKey, "TestApp").FullSerialize()}}
 	return metadata.NewIncomingContext(ctx, md)

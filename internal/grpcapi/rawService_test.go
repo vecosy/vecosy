@@ -43,7 +43,7 @@ func TestServer_GetFile(t *testing.T) {
 			}
 			ctx := context.Background()
 			if security {
-				ctx = applySecurityIn(t, privKey, ctx, mockRepo, app.AppName, app.AppVersion)
+				ctx = applySecurityIn(ctx, t, privKey, mockRepo, app.AppName, app.AppVersion)
 			}
 			response, err := srv.GetFile(ctx, request)
 			check.NoError(err)
@@ -78,7 +78,7 @@ func TestServer_GetFile_NotFound(t *testing.T) {
 			}
 			ctx := context.Background()
 			if security {
-				ctx = applySecurityIn(t, privKey, ctx, mockRepo, app.AppName, app.AppVersion)
+				ctx = applySecurityIn(ctx, t, privKey, mockRepo, app.AppName, app.AppVersion)
 			}
 			response, err := srv.GetFile(ctx, request)
 			check.EqualError(err, notFoundError.Error())
@@ -92,6 +92,7 @@ func TestServer_GetFile_Unauthorized(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	privKey, _, err := utils.GenerateKeyPair()
+	assert.NoError(t, err)
 	privKeyWrong, _, err := utils.GenerateKeyPair()
 	assert.NoError(t, err)
 
@@ -113,7 +114,7 @@ func TestServer_GetFile_Unauthorized(t *testing.T) {
 	prepareSecurityMock(app.AppName, app.AppVersion, mockRepo, privKey)
 
 	response, err := srv.GetFile(ctx, request)
-	check.Equal(err, security.AuthFailed)
+	check.Equal(err, security.ErrAuthFailed)
 	check.Nil(response)
 }
 
@@ -134,7 +135,7 @@ func TestServer_GetFile_InvalidApp(t *testing.T) {
 		FilePath:   filePath,
 	}
 	response, err := srv.GetFile(context.Background(), badAppNameRequest)
-	check.Equal(err, validation.InvalidApplicationName)
+	check.Equal(err, validation.ErrInvalidApplicationName)
 	check.Nil(response)
 
 	badAppVersionRequest := &GetFileRequest{
@@ -143,6 +144,6 @@ func TestServer_GetFile_InvalidApp(t *testing.T) {
 		FilePath:   filePath,
 	}
 	response, err = srv.GetFile(context.Background(), badAppVersionRequest)
-	check.Equal(err, validation.InvalidVersion)
+	check.Equal(err, validation.ErrInvalidVersion)
 	check.Nil(response)
 }

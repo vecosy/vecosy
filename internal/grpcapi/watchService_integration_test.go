@@ -43,7 +43,7 @@ func TestServer_Watch_IT(t *testing.T) {
 	})
 
 	ctx := context.Background()
-	ctx = applySecurityOut(t, privKey, ctx, mockRepo, app.AppName, app.AppVersion)
+	ctx = applySecurityOut(ctx, t, privKey, mockRepo, app.AppName, app.AppVersion)
 	stream, err := cl.Watch(ctx, request)
 	assert.NoError(t, err)
 

@@ -2,7 +2,7 @@ package restapi
 
 import (
 	"github.com/h2non/filetype"
-	"github.com/kataras/iris"
+	"github.com/kataras/iris/v12"
 	"github.com/sirupsen/logrus"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"mime"
@@ -10,11 +10,11 @@ import (
 )
 
 func (s *Server) registerRawEndpoints(parent iris.Party) {
-	configApi := parent.Party("/raw")
-	configApi.Get("/{appName:string}/{appVersion:string}/{filePath:path}", s.GetFile)
+	configAPI := parent.Party("/raw")
+	configAPI.Get("/{appName:string}/{appVersion:string}/{filePath:path}", s.getFile)
 }
 
-func (s *Server) GetFile(ctx iris.Context) {
+func (s *Server) getFile(ctx iris.Context) {
 	appName := ctx.Params().Get("appName")
 	appVersion := ctx.Params().Get("appVersion")
 	filePath := ctx.Params().Get("filePath")
@@ -35,7 +35,7 @@ func (s *Server) GetFile(ctx iris.Context) {
 	file, err := s.repo.GetFile(app, filePath)
 	if err != nil {
 		log.Errorf("error getting file err:%s", err)
-		if err == configrepo.FileNotFoundError {
+		if err == configrepo.ErrFileNotFound {
 			notFoundResponse(ctx)
 		} else {
 			internalServerError(ctx)

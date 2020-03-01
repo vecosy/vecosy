@@ -1,4 +1,4 @@
-package configGitRepo
+package gitconfigrepo
 
 import (
 	"fmt"
@@ -12,7 +12,7 @@ import (
 
 func TestConfigRepo_FetchingEvery(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	cfgRepo, err := NewGitConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
@@ -31,7 +31,7 @@ func TestConfigRepo_FetchingEvery(t *testing.T) {
 
 func TestConfigRepo_Fetch(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	cfgRepo, err := NewGitConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
@@ -58,7 +58,7 @@ func TestConfigRepo_Fetch(t *testing.T) {
 
 func TestConfigRepo_Fetch_NewVersion(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	cfgRepo, err := NewGitConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())
@@ -77,7 +77,7 @@ func TestConfigRepo_Fetch_NewVersion(t *testing.T) {
 
 func TestConfigRepo_Fetch_NewApplication(t *testing.T) {
 	localRepo, remoteRepo := InitRepos(t)
-	cfgRepo, err := NewConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
+	cfgRepo, err := NewGitConfigRepo(localRepo, &git.CloneOptions{URL: remoteRepo})
 	assert.NoError(t, err)
 	assert.NotNil(t, cfgRepo)
 	assert.NoError(t, cfgRepo.Init())

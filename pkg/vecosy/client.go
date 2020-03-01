@@ -13,8 +13,10 @@ import (
 	"time"
 )
 
+// OnChangeHandler handler executed on every configuration changes
 type OnChangeHandler = func()
 
+// Client represent a vecosy client
 type Client struct {
 	AppName           string
 	AppVersion        string
@@ -28,22 +30,26 @@ type Client struct {
 	onChangeHandlers  []OnChangeHandler
 }
 
-func (vc *Client) initViper(conf *viper.Viper) {
-	viperInstance := conf
-	if viperInstance == nil {
-		viperInstance = viper.GetViper()
+// UpdateConfig read the configuration from the vecosy server and update viper
+func (vc *Client) UpdateConfig() error {
+	vc.updateMutex.Lock()
+	defer vc.updateMutex.Unlock()
+	request := &vecosyGrpc.GetConfigRequest{
+		AppName:     vc.AppName,
+		AppVersion:  vc.AppVersion,
+		Environment: vc.Environment,
 	}
-	viperInstance.SetConfigType("yaml")
-	vc.viper = viperInstance
+	response, err := vc.smartConfigClient.GetConfig(vc.genContext(context.Background()), request)
+	if err != nil {
+		logrus.Errorf("Error getting configuration:%s", err)
+		return err
+	}
+	logrus.Debugf("Received %s", response.ConfigContent)
+	configReader := strings.NewReader(response.ConfigContent)
+	return vc.viper.ReadConfig(configReader)
 }
 
-func (vc *Client) genContext(parent context.Context) context.Context {
-	if vc.jwsToken != "" {
-		return metadata.AppendToOutgoingContext(parent, "token", vc.jwsToken)
-	}
-	return parent
-}
-
+// WatchChanges will start receiving the configuration changes from the vecosy server
 func (vc *Client) WatchChanges() error {
 	request := &vecosyGrpc.WatchRequest{
 		WatcherName: fmt.Sprintf("%s-watcher", vc.AppName),
@@ -60,6 +66,7 @@ func (vc *Client) WatchChanges() error {
 	return nil
 }
 
+// AddOnChangeHandler add a new changes handler to the client
 func (vc *Client) AddOnChangeHandler(handler OnChangeHandler) {
 	vc.onChangeHandlers = append(vc.onChangeHandlers, handler)
 }
@@ -84,25 +91,29 @@ func (vc *Client) watchChanges(watcher vecosyGrpc.WatchService_WatchClient) {
 			}
 		}
 	}
-	watcher.CloseSend()
+	err := watcher.CloseSend()
+	if err != nil {
+		logrus.Errorf("Error closing the watcher channel:%s", err)
+	}
 	// rescheduling myself
-	vc.WatchChanges()
+	err = vc.WatchChanges()
+	if err != nil {
+		logrus.Errorf("Error rescheduling the watcher:%s", err)
+	}
 }
 
-func (vc *Client) UpdateConfig() error {
-	vc.updateMutex.Lock()
-	defer vc.updateMutex.Unlock()
-	request := &vecosyGrpc.GetConfigRequest{
-		AppName:     vc.AppName,
-		AppVersion:  vc.AppVersion,
-		Environment: vc.Environment,
+func (vc *Client) initViper(conf *viper.Viper) {
+	viperInstance := conf
+	if viperInstance == nil {
+		viperInstance = viper.GetViper()
 	}
-	response, err := vc.smartConfigClient.GetConfig(vc.genContext(context.Background()), request)
-	if err != nil {
-		logrus.Errorf("Error getting configuration:%s", err)
-		return err
+	viperInstance.SetConfigType("yaml")
+	vc.viper = viperInstance
+}
+
+func (vc *Client) genContext(parent context.Context) context.Context {
+	if vc.jwsToken != "" {
+		return metadata.AppendToOutgoingContext(parent, "token", vc.jwsToken)
 	}
-	logrus.Debugf("Received %s", response.ConfigContent)
-	configReader := strings.NewReader(response.ConfigContent)
-	return vc.viper.ReadConfig(configReader)
+	return parent
 }

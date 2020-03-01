@@ -123,7 +123,7 @@ func (m *MockRawClient) GetFile(ctx context.Context, in *GetFileRequest, opts ..
 	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
-	ret := m.ctrl.Call(m, "GetFile", varargs...)
+	ret := m.ctrl.Call(m, "getFile", varargs...)
 	ret0, _ := ret[0].(*GetFileResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -133,7 +133,7 @@ func (m *MockRawClient) GetFile(ctx context.Context, in *GetFileRequest, opts ..
 func (mr *MockRawClientMockRecorder) GetFile(ctx, in interface{}, opts ...interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]interface{}{ctx, in}, opts...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFile", reflect.TypeOf((*MockRawClient)(nil).GetFile), varargs...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "getFile", reflect.TypeOf((*MockRawClient)(nil).GetFile), varargs...)
 }
 
 // MockRawServer is a mock of RawServer interface
@@ -162,7 +162,7 @@ func (m *MockRawServer) EXPECT() *MockRawServerMockRecorder {
 // GetFile mocks base method
 func (m *MockRawServer) GetFile(arg0 context.Context, arg1 *GetFileRequest) (*GetFileResponse, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetFile", arg0, arg1)
+	ret := m.ctrl.Call(m, "getFile", arg0, arg1)
 	ret0, _ := ret[0].(*GetFileResponse)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
@@ -171,7 +171,7 @@ func (m *MockRawServer) GetFile(arg0 context.Context, arg1 *GetFileRequest) (*Ge
 // GetFile indicates an expected call of GetFile
 func (mr *MockRawServerMockRecorder) GetFile(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFile", reflect.TypeOf((*MockRawServer)(nil).GetFile), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "getFile", reflect.TypeOf((*MockRawServer)(nil).GetFile), arg0, arg1)
 }
 
 // MockWatchServiceClient is a mock of WatchServiceClient interface

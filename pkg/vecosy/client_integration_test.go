@@ -132,6 +132,6 @@ func Test_Client_Unauthorized_IT(t *testing.T) {
 		WithJWSToken(jws.FullSerialize()).
 		Build(cfg)
 	check.Error(err)
-	check.Contains(err.Error(), security.AuthFailed.Error())
+	check.Contains(err.Error(), security.ErrAuthFailed.Error())
 	check.Nil(cl)
 }

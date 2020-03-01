@@ -9,7 +9,8 @@ import (
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 )
 
-var NotFoundError = errors.New("no pubkey found")
+// ErrNotFound no public key found on the cache
+var ErrNotFound = errors.New("no pubkey found")
 
 type keyCache interface {
 	StorePubKey(app *configrepo.ApplicationVersion, key *rsa.PublicKey) (*rsa.PublicKey, error)
@@ -38,17 +39,17 @@ func (kc *keyCacheImpl) getKey(app *configrepo.ApplicationVersion) string {
 func (kc *keyCacheImpl) GetPubKey(app *configrepo.ApplicationVersion) (*rsa.PublicKey, error) {
 	cacheVal, found := kc.cache.Get(kc.getKey(app))
 	if !found {
-		return nil, NotFoundError
+		return nil, ErrNotFound
 	}
 	if pubkey, ok := cacheVal.(rsa.PublicKey); ok {
 		return &pubkey, nil
 	}
-	return nil, NotFoundError
+	return nil, ErrNotFound
 }
 
 func (kc *keyCacheImpl) GetOrSetPubKey(repo configrepo.Repo, app *configrepo.ApplicationVersion) (*rsa.PublicKey, error) {
 	pubKey, err := kc.GetPubKey(app)
-	if err == NotFoundError {
+	if err == ErrNotFound {
 		pubKeyFile, err := repo.GetFile(app, "pub.key")
 		if err != nil {
 			return nil, err

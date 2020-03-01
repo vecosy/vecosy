@@ -7,6 +7,7 @@ import (
 	"gopkg.in/square/go-jose.v2"
 )
 
+// CheckJwtToken check a jws token signature
 func CheckJwtToken(repo configrepo.Repo, app *configrepo.ApplicationVersion, token string) error {
 	log := logrus.WithField("method", "CheckJwtToken")
 	repoPubKey, err := caches.KeyCache.GetOrSetPubKey(repo, app)
@@ -17,12 +18,12 @@ func CheckJwtToken(repo configrepo.Repo, app *configrepo.ApplicationVersion, tok
 	jws, err := jose.ParseSigned(token)
 	if err != nil {
 		log.Errorf("Error parsing jws:%s", err)
-		return AuthFailed
+		return ErrAuthFailed
 	}
 	_, err = jws.Verify(repoPubKey)
 	if err != nil {
 		log.Errorf("Error verifying jws:%s", err)
-		return AuthFailed
+		return ErrAuthFailed
 	}
 	return nil
 }

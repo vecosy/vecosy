@@ -1,6 +1,7 @@
-package configGitRepo
+package gitconfigrepo
 
 import (
+	"errors"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
@@ -8,6 +9,7 @@ import (
 	"time"
 )
 
+// StartFetchingEvery start auto fetch
 func (cr *GitConfigRepo) StartFetchingEvery(period time.Duration) error {
 	t := time.NewTicker(period)
 	go func() {
@@ -25,22 +27,23 @@ func (cr *GitConfigRepo) StartFetchingEvery(period time.Duration) error {
 	return nil
 }
 
+// StopFetching stop auto fetch
 func (cr *GitConfigRepo) StopFetching() {
 	cr.fetchCh <- true
 }
 
+// Fetch fetch from the remote git repo
 func (cr *GitConfigRepo) Fetch() error {
 	logrus.Info("Fetch")
 	if cr.cloneOpts != nil {
 		fetchOpts := &git.FetchOptions{Auth: cr.cloneOpts.Auth, Force: true, Tags: git.AllTags}
 		err := cr.repo.Fetch(fetchOpts)
 		if err != nil {
-			if err != git.NoErrAlreadyUpToDate {
+			if !errors.Is(err, git.NoErrAlreadyUpToDate) {
 				logrus.Errorf("Error fetching :%s", err)
 				return err
-			} else {
-				logrus.Info("already up to date")
 			}
+			logrus.Info("already up to date")
 		} else {
 			newApps, err := cr.loadApps()
 			if err != nil {
@@ -68,6 +71,7 @@ func (cr *GitConfigRepo) updateLastFetch() {
 	cr.lastFetch = &lastFetch
 }
 
+// GetLastFetch return the last fetch date
 func (cr *GitConfigRepo) GetLastFetch() *time.Time {
 	cr.lastFetchMutex.Lock()
 	defer cr.lastFetchMutex.Unlock()
