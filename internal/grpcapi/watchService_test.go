@@ -6,7 +6,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/vecosy/vecosy/v2/internal/security"
-	"github.com/vecosy/vecosy/v2/internal/utils"
+	"github.com/vecosy/vecosy/v2/internal/testutil"
 	"github.com/vecosy/vecosy/v2/internal/validation"
 	"github.com/vecosy/vecosy/v2/mocks"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
@@ -20,7 +20,7 @@ func TestServer_Watch(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	privKey, _, err := utils.GenerateKeyPair()
+	privKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 
 	for _, security := range []bool{false, true} {
@@ -66,9 +66,9 @@ func TestServer_Watch_Unauthorized(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	privKey, _, err := utils.GenerateKeyPair()
+	privKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
-	privKeyWrong, _, err := utils.GenerateKeyPair()
+	privKeyWrong, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 
 	mockRepo := mocks.NewMockRepo(ctrl)
@@ -89,7 +89,7 @@ func TestServer_Watch_Unauthorized(t *testing.T) {
 	stream := NewMockWatchService_WatchServer(ctrl)
 	streamCtx, cancelFn := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancelFn()
-	md := metadata.MD{"token": []string{utils.GenJwsFromPrivateKey(t, privKeyWrong, "TestApp").FullSerialize()}}
+	md := metadata.MD{"token": []string{testutil.GenJwsFromPrivateKey(t, privKeyWrong, "TestApp").FullSerialize()}}
 	streamCtx = metadata.NewIncomingContext(streamCtx, md)
 	prepareSecurityMock(app.AppName, app.AppVersion, mockRepo, privKey)
 	stream.EXPECT().Context().AnyTimes().Return(streamCtx)

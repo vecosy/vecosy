@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/vecosy/vecosy/v2/internal/grpcapi"
 	"github.com/vecosy/vecosy/v2/internal/security"
-	"github.com/vecosy/vecosy/v2/internal/utils"
+	"github.com/vecosy/vecosy/v2/internal/testutil"
 	"github.com/vecosy/vecosy/v2/mocks"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"os"
@@ -35,10 +35,10 @@ prop: %s`, environment, propValue)
 		Version: uuid.New().String(),
 		Content: []byte(configContent),
 	}
-	jwsPrivKey, _, err := utils.GenerateKeyPair()
+	jwsPrivKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 
-	certFile, certKeyFile, err := utils.GenerateCertificateFiles()
+	certFile, certKeyFile, err := testutil.GenerateCertificateFiles()
 	assert.NoError(t, err)
 	defer os.Remove(certFile)
 	defer os.Remove(certKeyFile)
@@ -73,9 +73,9 @@ prop: %s`, environment, propValue)
 				if secEnabled {
 					mockRepo.EXPECT().GetFile(app, "pub.key").Return(&configrepo.RepoFile{
 						Version: uuid.New().String(),
-						Content: utils.PublicKeyToBytes(&jwsPrivKey.PublicKey),
+						Content: testutil.PublicKeyToBytes(&jwsPrivKey.PublicKey),
 					}, nil)
-					jws := utils.GenJwsFromPrivateKey(t, jwsPrivKey, "testApp")
+					jws := testutil.GenJwsFromPrivateKey(t, jwsPrivKey, "testApp")
 					builder.WithJWSToken(jws.FullSerialize())
 				} else {
 					builder.Insecure()
@@ -103,9 +103,9 @@ func Test_Client_Unauthorized_IT(t *testing.T) {
 	app := configrepo.NewApplicationVersion(appName, appVersion)
 	environment := "dev"
 
-	privKey, _, err := utils.GenerateKeyPair()
+	privKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
-	wrongPrivKey, _, err := utils.GenerateKeyPair()
+	wrongPrivKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 	check := assert.New(t)
 	freePort, err := freeport.GetFreePort()
@@ -125,9 +125,9 @@ func Test_Client_Unauthorized_IT(t *testing.T) {
 	cfg := viper.New()
 	mockRepo.EXPECT().GetFile(app, "pub.key").Return(&configrepo.RepoFile{
 		Version: uuid.New().String(),
-		Content: utils.PublicKeyToBytes(&privKey.PublicKey),
+		Content: testutil.PublicKeyToBytes(&privKey.PublicKey),
 	}, nil)
-	jws := utils.GenJwsFromPrivateKey(t, wrongPrivKey, "testApp")
+	jws := testutil.GenJwsFromPrivateKey(t, wrongPrivKey, "testApp")
 	cl, err := NewBuilder(address, appName, appVersion, environment).
 		WithJWSToken(jws.FullSerialize()).
 		Build(cfg)

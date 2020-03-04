@@ -1,8 +1,7 @@
-fixes:
-  - "v2/::"
 ignore:
   - "**/*.pb.go"
   - "**/*mock*"
   - "**/errors.go"
+  - "**/testutil/*.go"
 coverage:
   range: "50..100"

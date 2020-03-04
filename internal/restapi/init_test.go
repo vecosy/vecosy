@@ -6,7 +6,7 @@ import (
 	"github.com/gavv/httpexpect"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/vecosy/vecosy/v2/internal/utils"
+	"github.com/vecosy/vecosy/v2/internal/testutil"
 	"github.com/vecosy/vecosy/v2/mocks"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"gopkg.in/square/go-jose.v2"
@@ -21,6 +21,6 @@ func applySecurity(t *testing.T, privKey *rsa.PrivateKey, req *httpexpect.Reques
 	req.WithHeader("Authorization", fmt.Sprintf("Bearer %s", jws.FullSerialize()))
 	repo.EXPECT().GetFile(app, "pub.key").Return(&configrepo.RepoFile{
 		Version: uuid.New().String(),
-		Content: utils.PublicKeyToBytes(&privKey.PublicKey),
+		Content: testutil.PublicKeyToBytes(&privKey.PublicKey),
 	}, nil)
 }

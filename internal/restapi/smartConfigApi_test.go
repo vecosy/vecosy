@@ -7,6 +7,7 @@ import (
 	"github.com/kataras/iris/v12/context"
 	"github.com/kataras/iris/v12/httptest"
 	"github.com/stretchr/testify/assert"
+	"github.com/vecosy/vecosy/v2/internal/testutil"
 	"github.com/vecosy/vecosy/v2/internal/utils"
 	"github.com/vecosy/vecosy/v2/mocks"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
@@ -36,7 +37,7 @@ func TestServer_GetSmartConfig(t *testing.T) {
 	app1DevYmlContent, err := yaml.Marshal(app1DevContent)
 	assert.NoError(t, err)
 
-	privKey, _, err := utils.GenerateKeyPair()
+	privKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 
 	for _, security := range []bool{false, true} {
@@ -85,7 +86,7 @@ func TestServer_GetSmartConfig(t *testing.T) {
 				req = req.WithHeader("Accept", context.ContentYAMLHeaderValue)
 				repo.EXPECT().GetFile(app, "pub.key").Return(&configrepo.RepoFile{
 					Version: uuid.New().String(),
-					Content: utils.PublicKeyToBytes(&privKey.PublicKey),
+					Content: testutil.PublicKeyToBytes(&privKey.PublicKey),
 				}, nil)
 				res := req.Expect()
 				res.Status(httptest.StatusUnauthorized)

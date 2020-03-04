@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/phayes/freeport"
 	"github.com/stretchr/testify/assert"
-	"github.com/vecosy/vecosy/v2/internal/utils"
+	"github.com/vecosy/vecosy/v2/internal/testutil"
 	"github.com/vecosy/vecosy/v2/mocks"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"google.golang.org/grpc/metadata"
@@ -36,13 +36,13 @@ func StartGRPCServerIT(ctrl *gomock.Controller, t *testing.T, security bool) (*m
 // used on the integration tests
 func applySecurityOut(ctx context.Context, t *testing.T, privKey *rsa.PrivateKey, repo *mocks.MockRepo, appName, appVersion string) context.Context {
 	prepareSecurityMock(appName, appVersion, repo, privKey)
-	return metadata.AppendToOutgoingContext(ctx, "token", utils.GenJwsFromPrivateKey(t, privKey, "TestApp").FullSerialize())
+	return metadata.AppendToOutgoingContext(ctx, "token", testutil.GenJwsFromPrivateKey(t, privKey, "TestApp").FullSerialize())
 }
 
 // used on the unit tests
 func applySecurityIn(ctx context.Context, t *testing.T, privKey *rsa.PrivateKey, repo *mocks.MockRepo, appName, appVersion string) context.Context {
 	prepareSecurityMock(appName, appVersion, repo, privKey)
-	md := metadata.MD{"token": []string{utils.GenJwsFromPrivateKey(t, privKey, "TestApp").FullSerialize()}}
+	md := metadata.MD{"token": []string{testutil.GenJwsFromPrivateKey(t, privKey, "TestApp").FullSerialize()}}
 	return metadata.NewIncomingContext(ctx, md)
 }
 
@@ -50,6 +50,6 @@ func prepareSecurityMock(appName string, appVersion string, repo *mocks.MockRepo
 	cfgApp := &configrepo.ApplicationVersion{AppName: appName, AppVersion: appVersion}
 	repo.EXPECT().GetFile(cfgApp, "pub.key").Return(&configrepo.RepoFile{
 		Version: uuid.New().String(),
-		Content: utils.PublicKeyToBytes(&privKey.PublicKey),
+		Content: testutil.PublicKeyToBytes(&privKey.PublicKey),
 	}, nil)
 }

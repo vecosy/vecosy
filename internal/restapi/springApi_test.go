@@ -9,7 +9,7 @@ import (
 	"github.com/kataras/iris/v12/httptest"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"github.com/vecosy/vecosy/v2/internal/utils"
+	"github.com/vecosy/vecosy/v2/internal/testutil"
 	"github.com/vecosy/vecosy/v2/mocks"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"os"
@@ -65,7 +65,7 @@ func TestServer_Get_OnlyProfile(t *testing.T) {
 	app1DevContent := map[string]interface{}{"prop1": uuid.New().String(), "sub": map[string]interface{}{"subProp1": uuid.New().String()}}
 	ymlContent, err := yaml.Marshal(app1DevContent)
 	assert.NoError(t, err)
-	privKey, _, err := utils.GenerateKeyPair()
+	privKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 
 	for _, security := range []bool{false, true} {
@@ -130,7 +130,7 @@ func TestServer_Get_OnlyProfile(t *testing.T) {
 			t.Run("unauthorized", func(t *testing.T) {
 				repo.EXPECT().GetFile(app, "pub.key").Return(&configrepo.RepoFile{
 					Version: uuid.New().String(),
-					Content: utils.PublicKeyToBytes(&privKey.PublicKey),
+					Content: testutil.PublicKeyToBytes(&privKey.PublicKey),
 				}, nil)
 				req := ht.GET(fmt.Sprintf("/v1/spring/%s/%s-%s.yml", appVersion, appName, appProfiles))
 				res := req.Expect()
@@ -168,7 +168,7 @@ func TestServer_Get_ProfileAndCommon(t *testing.T) {
 	assert.NoError(t, err)
 	app1IntYmlContent, err := yaml.Marshal(app1IntContent)
 	assert.NoError(t, err)
-	privKey, _, err := utils.GenerateKeyPair()
+	privKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 
 	for _, security := range []bool{false, true} {
@@ -330,7 +330,7 @@ func TestServer_Get_ProfileAndCommon(t *testing.T) {
 				req := ht.GET(fmt.Sprintf("/v1/spring/%s/%s-%s.yml", appVersion, appName, devStrProfiles))
 				repo.EXPECT().GetFile(app, "pub.key").Return(&configrepo.RepoFile{
 					Version: uuid.New().String(),
-					Content: utils.PublicKeyToBytes(&privKey.PublicKey),
+					Content: testutil.PublicKeyToBytes(&privKey.PublicKey),
 				}, nil)
 				res := req.Expect()
 				res.Status(httptest.StatusUnauthorized)

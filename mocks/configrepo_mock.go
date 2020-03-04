@@ -6,7 +6,7 @@ package mocks
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	go_version "github.com/hashicorp/go-version"
+	version "github.com/hashicorp/go-version"
 	configrepo "github.com/vecosy/vecosy/v2/pkg/configrepo"
 	reflect "reflect"
 	time "time"
@@ -50,10 +50,10 @@ func (mr *MockRepoMockRecorder) Init() *gomock.Call {
 }
 
 // GetAppsVersions mocks base method
-func (m *MockRepo) GetAppsVersions() map[string][]*go_version.Version {
+func (m *MockRepo) GetAppsVersions() map[string][]*version.Version {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAppsVersions")
-	ret0, _ := ret[0].(map[string][]*go_version.Version)
+	ret0, _ := ret[0].(map[string][]*version.Version)
 	return ret0
 }
 

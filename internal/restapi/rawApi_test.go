@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/kataras/iris/v12/httptest"
 	"github.com/stretchr/testify/assert"
+	"github.com/vecosy/vecosy/v2/internal/testutil"
 	"github.com/vecosy/vecosy/v2/internal/utils"
 	"github.com/vecosy/vecosy/v2/mocks"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
@@ -26,7 +27,7 @@ func TestServer_GetFile(t *testing.T) {
 	ymlContent, err := yaml.Marshal(app1DevContent)
 	assert.NoError(t, err)
 
-	privKey, _, err := utils.GenerateKeyPair()
+	privKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 
 	for _, security := range []bool{false, true} {
@@ -80,7 +81,7 @@ func TestServer_GetFile(t *testing.T) {
 				fileReq := req.WithPath("filePath", filePath)
 				repo.EXPECT().GetFile(app, "pub.key").Return(&configrepo.RepoFile{
 					Version: uuid.New().String(),
-					Content: utils.PublicKeyToBytes(&privKey.PublicKey),
+					Content: testutil.PublicKeyToBytes(&privKey.PublicKey),
 				}, nil)
 				fileReq.Expect().Status(httptest.StatusUnauthorized)
 			})

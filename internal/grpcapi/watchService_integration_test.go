@@ -7,7 +7,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"github.com/vecosy/vecosy/v2/internal/utils"
+	"github.com/vecosy/vecosy/v2/internal/testutil"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
 	"google.golang.org/grpc"
 	"io"
@@ -18,7 +18,7 @@ import (
 func TestServer_Watch_IT(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	privKey, _, err := utils.GenerateKeyPair()
+	privKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 
 	mockRepo, srv := StartGRPCServerIT(ctrl, t, true)

@@ -7,7 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/vecosy/vecosy/v2/internal/security"
-	"github.com/vecosy/vecosy/v2/internal/utils"
+	"github.com/vecosy/vecosy/v2/internal/testutil"
 	"github.com/vecosy/vecosy/v2/internal/validation"
 	"github.com/vecosy/vecosy/v2/mocks"
 	"github.com/vecosy/vecosy/v2/pkg/configrepo"
@@ -19,7 +19,7 @@ func TestServer_GetFile(t *testing.T) {
 	check := assert.New(t)
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	privKey, _, err := utils.GenerateKeyPair()
+	privKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 
 	for _, security := range []bool{false, true} {
@@ -57,7 +57,7 @@ func TestServer_GetFile_NotFound(t *testing.T) {
 	check := assert.New(t)
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	privKey, _, err := utils.GenerateKeyPair()
+	privKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 
 	for _, security := range []bool{false, true} {
@@ -91,9 +91,9 @@ func TestServer_GetFile_Unauthorized(t *testing.T) {
 	check := assert.New(t)
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
-	privKey, _, err := utils.GenerateKeyPair()
+	privKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
-	privKeyWrong, _, err := utils.GenerateKeyPair()
+	privKeyWrong, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 
 	mockRepo := mocks.NewMockRepo(ctrl)
@@ -109,7 +109,7 @@ func TestServer_GetFile_Unauthorized(t *testing.T) {
 		FilePath:   filePath,
 	}
 	ctx := context.Background()
-	md := metadata.MD{"token": []string{utils.GenJwsFromPrivateKey(t, privKeyWrong, "TestApp").FullSerialize()}}
+	md := metadata.MD{"token": []string{testutil.GenJwsFromPrivateKey(t, privKeyWrong, "TestApp").FullSerialize()}}
 	ctx = metadata.NewIncomingContext(ctx, md)
 	prepareSecurityMock(app.AppName, app.AppVersion, mockRepo, privKey)
 

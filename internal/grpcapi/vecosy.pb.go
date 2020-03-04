@@ -355,7 +355,9 @@ func init() {
 	proto.RegisterType((*WatchResponse)(nil), "grpcapi.WatchResponse")
 }
 
-func init() { proto.RegisterFile("vecosy.proto", fileDescriptor_f4b068b76ab253eb) }
+func init() {
+	proto.RegisterFile("vecosy.proto", fileDescriptor_f4b068b76ab253eb)
+}
 
 var fileDescriptor_f4b068b76ab253eb = []byte{
 	// 362 bytes of a gzipped FileDescriptorProto
@@ -386,11 +388,11 @@ var fileDescriptor_f4b068b76ab253eb = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // SmartConfigClient is the client API for SmartConfig service.
 //
@@ -400,10 +402,10 @@ type SmartConfigClient interface {
 }
 
 type smartConfigClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewSmartConfigClient(cc *grpc.ClientConn) SmartConfigClient {
+func NewSmartConfigClient(cc grpc.ClientConnInterface) SmartConfigClient {
 	return &smartConfigClient{cc}
 }
 
@@ -472,16 +474,16 @@ type RawClient interface {
 }
 
 type rawClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewRawClient(cc *grpc.ClientConn) RawClient {
+func NewRawClient(cc grpc.ClientConnInterface) RawClient {
 	return &rawClient{cc}
 }
 
 func (c *rawClient) GetFile(ctx context.Context, in *GetFileRequest, opts ...grpc.CallOption) (*GetFileResponse, error) {
 	out := new(GetFileResponse)
-	err := c.cc.Invoke(ctx, "/grpcapi.Raw/getFile", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/grpcapi.Raw/GetFile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -498,7 +500,7 @@ type UnimplementedRawServer struct {
 }
 
 func (*UnimplementedRawServer) GetFile(ctx context.Context, req *GetFileRequest) (*GetFileResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method getFile not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method GetFile not implemented")
 }
 
 func RegisterRawServer(s *grpc.Server, srv RawServer) {
@@ -515,7 +517,7 @@ func _Raw_GetFile_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpcapi.Raw/getFile",
+		FullMethod: "/grpcapi.Raw/GetFile",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(RawServer).GetFile(ctx, req.(*GetFileRequest))
@@ -528,7 +530,7 @@ var _Raw_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*RawServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "getFile",
+			MethodName: "GetFile",
 			Handler:    _Raw_GetFile_Handler,
 		},
 	},
@@ -544,10 +546,10 @@ type WatchServiceClient interface {
 }
 
 type watchServiceClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewWatchServiceClient(cc *grpc.ClientConn) WatchServiceClient {
+func NewWatchServiceClient(cc grpc.ClientConnInterface) WatchServiceClient {
 	return &watchServiceClient{cc}
 }
 
