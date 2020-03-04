@@ -21,7 +21,7 @@ func TestServer_Watch_IT(t *testing.T) {
 	privKey, _, err := testutil.GenerateKeyPair()
 	assert.NoError(t, err)
 
-	mockRepo, srv := StartGRPCServerIT(ctrl, t, true)
+	mockRepo, srv := startGRPCServerIT(ctrl, t, true)
 
 	conn, err := grpc.Dial(srv.address, grpc.WithInsecure())
 	assert.NoError(t, err)

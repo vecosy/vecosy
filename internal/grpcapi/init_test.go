@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-func StartGRPCServerIT(ctrl *gomock.Controller, t *testing.T, security bool) (*mocks.MockRepo, *Server) {
+func startGRPCServerIT(ctrl *gomock.Controller, t *testing.T, security bool) (*mocks.MockRepo, *Server) {
 	mockRepo := mocks.NewMockRepo(ctrl)
 	freePort, err := freeport.GetFreePort()
 	assert.NoError(t, err)

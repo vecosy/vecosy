@@ -3,5 +3,7 @@ ignore:
   - "**/*mock*"
   - "**/errors.go"
   - "**/testutil/*.go"
+  - "cmd/*.go"
+  - "main.go"
 coverage:
-  range: "50..100"
+  range: "50..90"

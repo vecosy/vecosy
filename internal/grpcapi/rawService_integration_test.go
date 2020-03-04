@@ -23,7 +23,7 @@ func TestServer_GetFile_IT(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	mockRepo, srv := StartGRPCServerIT(ctrl, t, false)
+	mockRepo, srv := startGRPCServerIT(ctrl, t, false)
 
 	appName := "app1"
 	appVersion := "1.0.0"

@@ -16,6 +16,7 @@ import (
 	"time"
 )
 
+// GenerateCertificate TEST-ONLY: generate a private key and a certificate
 func GenerateCertificate() ([]byte, []byte, error) {
 	privKey, pubKey, err := GenerateKeyPair()
 	if err != nil {

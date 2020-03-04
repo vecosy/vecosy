@@ -22,4 +22,3 @@ func TestPublicKeyConversions(t *testing.T) {
 	check.Error(err)
 	check.Nil(readedPubKey)
 }
-
