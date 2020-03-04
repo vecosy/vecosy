@@ -9,6 +9,16 @@ before_install:
 
 script:
   - go test -v ./... --tags integration -coverpkg=./... -coverprofile=coverage.txt -covermode=atomic
+  - go build -o vecosyd
+
+deploy:
+    provider: releases
+    api_key: $GITHUB_OAUTH_TOKEN
+    file: "vecosyd"
+    skip_cleanup: true
+    draft: true
+    on:
+      branch: "develop"
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
