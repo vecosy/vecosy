@@ -1,7 +1,7 @@
 # Centralized Configuration System
 [![Build Status](https://travis-ci.com/vecosy/vecosy.svg)](https://travis-ci.com/vecosy/vecosy)
 [![codecov](https://codecov.io/gh/vecosy/vecosy/branch/develop/graph/badge.svg)](https://codecov.io/gh/vecosy/vecosy)
-[![Build Status](https://img.shields.io/badge/docker-pull%20vecosy%2Fvecosy%3Adev-blue)](https://hub.docker.com/repository/docker/vecosy/vecosy)
+[![Build Status](https://img.shields.io/badge/docker-pull%20vecosy%2Fvecosy-blue)](https://hub.docker.com/repository/docker/vecosy/vecosy)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vecosy/vecosy)](https://goreportcard.com/report/github.com/vecosy/vecosy)
 [![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/vecosy/community)
 
@@ -44,7 +44,7 @@ import (
 
 func main() {
 	jwsToken := "eyJhbGciOiJSUzI1NiJ9.YXBwMQo.A98GFL-P3vtehn0r5GCO_a0OYb5h6trxg3a8WE9hOPDzJ40yOEGtZxyUM6_3Exk65c52-nzWEEc5P-QtgGrgJFOOZlKneKoa1bYBlWRONoysuq95UtSY0doEOMWGvI9AqB685OzmVPuW2UlHg_HlQuuTO6Re1uKc5gr1qZPlyyWEsfoVYTFbfidLoBKWPOuZTxpd8uRx0Rv3LrrmFEcGPHaMNQ2WiXAEJG6OaMTBtwKiynEFH3DU5Rx2WP9M98bH-emC_w7Zq1xKaCOsj2t09F00KohcGC49zSPgPVpp_TwF1qt6_0d0Mnh_Eqi_NHpobVvO85ZOLS05AyW9LQyA5A"
-	vecosyCl, err := vecosy.NewBuilder("localhost:8081", "app1", "1.0.0", "dev").WithJWSToken(jwsToken).Build(nil)
+	vecosyCl, err := vecosy.NewClientBuilder("localhost:8081", "app1", "1.0.0", "dev").WithJWSToken(jwsToken).Build(nil)
 	panicOnError(err)
 	err = vecosyCl.WatchChanges()
 	panicOnError(err)

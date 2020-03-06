@@ -7,7 +7,7 @@ WORKDIR /go/src
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o vecosy-server
 
-FROM alpine:latest
+FROM golang:latest
 RUN mkdir /config
 EXPOSE 8080
 EXPOSE 8081
