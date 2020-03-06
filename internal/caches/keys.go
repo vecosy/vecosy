@@ -49,7 +49,7 @@ func (kc *keyCacheImpl) GetPubKey(app *configrepo.ApplicationVersion) (*rsa.Publ
 
 func (kc *keyCacheImpl) GetOrSetPubKey(repo configrepo.Repo, app *configrepo.ApplicationVersion) (*rsa.PublicKey, error) {
 	pubKey, err := kc.GetPubKey(app)
-	if err == ErrNotFound {
+	if errors.Is(err, ErrNotFound) {
 		pubKeyFile, err := repo.GetFile(app, "pub.key")
 		if err != nil {
 			return nil, err

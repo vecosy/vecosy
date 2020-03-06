@@ -18,7 +18,7 @@ func mergeFiles(repo configrepo.Repo, app *configrepo.ApplicationVersion, appCon
 	for _, configFilePath := range appConfigFiles {
 		profileFile, err := repo.GetFile(app, configFilePath)
 		if err != nil {
-			if err == configrepo.ErrApplicationNotFound {
+			if errors.Is(err, configrepo.ErrApplicationNotFound) {
 				return nil, err
 			}
 			logrus.Warnf("Error getting file:%s, err:%s", configFilePath, err)

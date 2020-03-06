@@ -24,6 +24,7 @@ func (s *Server) GetFile(ctx context.Context, request *GetFileRequest) (*GetFile
 
 	file, err := s.repo.GetFile(appVersion, request.FilePath)
 	if err != nil {
+		log.Errorf("Error getting file %s: %s", request.FilePath, err)
 		return nil, err
 	}
 	return &GetFileResponse{

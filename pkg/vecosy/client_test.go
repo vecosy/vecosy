@@ -93,12 +93,19 @@ prop: %s`, environment, propValue2)
 	mockSmartConfigCl.EXPECT().GetConfig(gomock.Any(), request).Return(response2, nil)
 
 	onChangeFnCalled := false
-	onChangeFn := func() { onChangeFnCalled = true }
+	var oldSettingPropValue string
+	onChangeFn := func(oldSettings map[string]interface{}) {
+		oldSettingPropValue = oldSettings["prop"].(string)
+		onChangeFnCalled = true
+	}
 	vecosyCl.AddOnChangeHandler(onChangeFn)
 
 	checks.NoError(vecosyCl.WatchChanges())
 	time.Sleep(2 * time.Second)
 	checks.Equal(cfg.GetString("environment"), environment)
 	checks.Equal(cfg.GetString("prop"), propValue2)
+
+	// checking onChangeHandler
 	checks.True(onChangeFnCalled)
+	checks.Equal(oldSettingPropValue, propValue1)
 }

@@ -69,7 +69,7 @@ prop: %s`, environment, propValue)
 				defer srv.Stop()
 
 				cfg := viper.New()
-				builder := NewBuilder(address, appName, appVersion, environment)
+				builder := NewClientBuilder(address, appName, appVersion, environment)
 				if secEnabled {
 					mockRepo.EXPECT().GetFile(app, "pub.key").Return(&configrepo.RepoFile{
 						Version: uuid.New().String(),
@@ -128,7 +128,7 @@ func Test_Client_Unauthorized_IT(t *testing.T) {
 		Content: testutil.PublicKeyToBytes(&privKey.PublicKey),
 	}, nil)
 	jws := testutil.GenJwsFromPrivateKey(t, wrongPrivKey, "testApp")
-	cl, err := NewBuilder(address, appName, appVersion, environment).
+	cl, err := NewClientBuilder(address, appName, appVersion, environment).
 		WithJWSToken(jws.FullSerialize()).
 		Build(cfg)
 	check.Error(err)

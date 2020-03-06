@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"fmt"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,11 +15,15 @@ import (
 var cfgFile string
 var insecureFlag *bool
 var verboseFlag *bool
+var ignoreTlsCertValidationFlag *bool
 
 var rootCmd = &cobra.Command{
 	Use:   "vecosy",
 	Short: "VeCoSy - Versioned Configuration System Server",
 	Run: func(cmd *cobra.Command, args []string) {
+		if *ignoreTlsCertValidationFlag {
+			http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+		}
 		cfgRepo := initRepo()
 		go startRest(cfgRepo)
 		go startGRPC(cfgRepo)
@@ -53,17 +59,19 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig, initLogger)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./config/vecosy.yml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file")
 	insecureFlag = rootCmd.PersistentFlags().Bool("insecure", false, "disable the authentication")
 
-	rootCmd.PersistentFlags().String("rest-address", ":8443", "rest address i.e. 0.0.0.0:8443")
-	rootCmd.PersistentFlags().String("grpc-address", ":8080", "grpc address i.e. 0.0.0.0:8080")
+	// NET ports
+	rootCmd.PersistentFlags().String("rest-address", ":8080", "rest address i.e. 0.0.0.0:8080")
+	rootCmd.PersistentFlags().String("grpc-address", ":8081", "grpc address i.e. 0.0.0.0:8081")
 	err := viper.BindPFlag("server.rest.address", rootCmd.PersistentFlags().Lookup("rest-address"))
 	failOnError(err)
 	err = viper.BindPFlag("server.grpc.address", rootCmd.PersistentFlags().Lookup("grpc-address"))
 	failOnError(err)
 
-	rootCmd.PersistentFlags().Bool("tls", true, "tls enabled")
+	// TLS
+	rootCmd.PersistentFlags().Bool("tls", false, "enable the tls")
 	rootCmd.PersistentFlags().String("tls-cert", "", "tls certificate file")
 	rootCmd.PersistentFlags().String("tls-key", "", "tls key file")
 	err = viper.BindPFlag("server.tls.enabled", rootCmd.PersistentFlags().Lookup("tls"))
@@ -72,6 +80,8 @@ func init() {
 	failOnError(err)
 	err = viper.BindPFlag("server.tls.keyFile", rootCmd.PersistentFlags().Lookup("tls-key"))
 	failOnError(err)
+
+	ignoreTlsCertValidationFlag = rootCmd.PersistentFlags().Bool("ignore-tls-validation", false, "ignore certification validation (useful for company proxy certificate)")
 
 	verboseFlag = rootCmd.Flags().BoolP("verbose", "v", false, "debug messages")
 }

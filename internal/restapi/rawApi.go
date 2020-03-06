@@ -1,6 +1,7 @@
 package restapi
 
 import (
+	"errors"
 	"github.com/h2non/filetype"
 	"github.com/kataras/iris/v12"
 	"github.com/sirupsen/logrus"
@@ -35,7 +36,7 @@ func (s *Server) getFile(ctx iris.Context) {
 	file, err := s.repo.GetFile(app, filePath)
 	if err != nil {
 		log.Errorf("error getting file err:%s", err)
-		if err == configrepo.ErrFileNotFound {
+		if errors.Is(err, configrepo.ErrFileNotFound) {
 			notFoundResponse(ctx)
 		} else {
 			internalServerError(ctx)

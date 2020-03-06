@@ -14,7 +14,7 @@ import (
 )
 
 // OnChangeHandler handler executed on every configuration changes
-type OnChangeHandler = func()
+type OnChangeHandler = func(oldSettings map[string]interface{})
 
 // Client represent a vecosy client
 type Client struct {
@@ -81,12 +81,13 @@ func (vc *Client) watchChanges(watcher vecosyGrpc.WatchService_WatchClient) {
 			break
 		} else {
 			if changes.Changed {
+				oldSettings :=vc.viper.AllSettings()
 				err = vc.UpdateConfig()
 				if err != nil {
 					logrus.Errorf("Error updating configuration :%s", err)
 				}
 				for _, onChangeHandler := range vc.onChangeHandlers {
-					onChangeHandler()
+					onChangeHandler(oldSettings)
 				}
 			}
 		}

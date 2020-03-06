@@ -17,6 +17,185 @@
 * REST
 * Auto update (currently only with golang client)
 
+
+# QuickStart (demo)
+The demo uses the [config-sample](https://github.com/vecosy/config-sample) repository
+## Run the server
+```shell script
+$> docker pull vecosy/vecosy:demo
+$> docker run --rm  -p 8080:8080 -p 8081:8081 vecosy/vecosy:demo
+```
+
+### Generate the JWS token
+Use the [app1/1.0.0 branch](https://github.com/vecosy/config-sample/tree/app1/1.0.0) to run
+```
+echo "app1" | jose-util sign --key priv.key --alg RS256
+```
+*the code below has already a valid token for the vecosy:demo*
+
+## Golang Client 
+```
+package main
+
+import (
+	"fmt"
+	"github.com/spf13/viper"
+	"github.com/vecosy/vecosy/v2/pkg/vecosy"
+)
+
+func main() {
+	jwsToken := "eyJhbGciOiJSUzI1NiJ9.YXBwMQo.A98GFL-P3vtehn0r5GCO_a0OYb5h6trxg3a8WE9hOPDzJ40yOEGtZxyUM6_3Exk65c52-nzWEEc5P-QtgGrgJFOOZlKneKoa1bYBlWRONoysuq95UtSY0doEOMWGvI9AqB685OzmVPuW2UlHg_HlQuuTO6Re1uKc5gr1qZPlyyWEsfoVYTFbfidLoBKWPOuZTxpd8uRx0Rv3LrrmFEcGPHaMNQ2WiXAEJG6OaMTBtwKiynEFH3DU5Rx2WP9M98bH-emC_w7Zq1xKaCOsj2t09F00KohcGC49zSPgPVpp_TwF1qt6_0d0Mnh_Eqi_NHpobVvO85ZOLS05AyW9LQyA5A"
+	vecosyCl, err := vecosy.NewBuilder("localhost:8081", "app1", "1.0.0", "dev").WithJWSToken(jwsToken).Build(nil)
+	panicOnError(err)
+	err = vecosyCl.WatchChanges()
+	panicOnError(err)
+	fmt.Printf("db.user:%s\n", viper.GetString("db.user"))
+}
+
+func panicOnError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+```
+
+## Spring Client
+Take a look to [spring-boot-example](https://github.com/vecosy/spring-boot-example)
+
+## Endpoints
+Remember to add the `Authorization` header with the token generated before `Bearer [token]` 
+(except if the server has been started with `--insecure` option)
+
+### SmartConfig Strategies
+from [app1/1.0.0](https://github.com/vecosy/config-sample/tree/app1/1.0.0)
+* http://localhost:8080/v1/config/app1/1.0.0/dev
+* http://localhost:8080/v1/config/app1/1.0.0/int
+
+### Spring-could Strategies
+for [spring-app1/v1.0.0](https://github.com/vecosy/config-sample/tree/spring-app1/1.0.0) 
+* http://localhost:8080/v1/spring/v1.0.0/spring-app1/dev
+* http://localhost:8080/v1/spring/v1.0.0/spring-app1/int
+
+### Raw file
+for [app1/1.0.0](https://github.com/vecosy/config-sample/tree/app1/1.0.0)
+* http://localhost:8080/v1/raw/app1/1.0.0/config.yml
+* http://localhost:8080/v1/raw/app1/1.0.0/dev/config.yml
+
+for [spring-app1/1.0.0](https://github.com/vecosy/config-sample/tree/spring-app1/1.0.0) 
+* http://localhost:8080/v1/raw/spring-app1/1.0.0/application.yml
+* http://localhost:8080/v1/raw/spring-app1/1.0.0/spring-app1-dev.yml
+
+
+# Docker run
+## Prepare the configuration
+Create a folder for the server configuration `$HOME/myVecosyConf`.
+
+Create a `$HOME/myVecosyConf/vecosy.yml`with your configuration (see [configuration](#Server Configuration) chapter)
+
+## Run
+```shell script
+$> docker -d --name myVecosyInstance -v $HOME/myVecosyConf:/config -p 8080:8080 -p 8081:8081 vecosy/vecosy:latest
+```
+
+# Server Configuration
+*some configuration options can be passed via command line run `vecosy-server --help` for the options*
+
+## TLS
+```yaml
+server:
+  tls:
+    enabled: true
+    certificateFile: ./myCert.crt
+    keyFile: ./myCert.key
+  rest:
+    address: ":8443"
+  grpc:
+    address: ":8081"
+...
+```
+## GIT authentication
+### No authentication
+```yaml
+...
+repo:
+  remote:
+    url: https://github.com/vecosy/config-sample.git
+    pullEvery: 30s
+  local:
+    path: /tmp/vecosyData
+```
+
+### plain authentication
+```yaml
+...
+repo:
+  remote:
+    url: https://github.com/vecosy/config-sample.git
+    pullEvery: 30s
+    auth:
+      type: plain
+      username: gitRepoUsername
+      password: gitRepoPassword
+  local:
+    path: /tmp/vecosyData
+```
+
+### http (basic) authentication
+```yaml
+...
+repo:
+  remote:
+    url: https://github.com/vecosy/config-sample.git
+    pullEvery: 30s
+    auth:
+      type: http
+      username: gitRepoUsername
+      password: gitRepoPassword
+  local:
+    path: /tmp/vecosyData
+```
+
+### public key authentication
+```yaml
+...
+repo:
+  remote:
+    url: github.com:vecosy/config-sample.git
+    pullEvery: 30s
+    auth:
+      type: pubKey
+      username: git
+      keyFile: ./myPubKeyFile
+      keyFilePassword: myPubKeyPassword
+  local:
+    path: /tmp/vecosyData
+```
+
+## Full Example
+```yaml
+server:
+  tls:
+    enabled: true
+    certificateFile: ./myCert.crt
+    keyFile: ./myCert.key
+  rest:
+    address: ":8443"
+  grpc:
+    address: ":8081"
+repo:
+  remote:
+    url: github.com:vecosy/config-sample.git
+    pullEvery: 30s
+    auth:
+      type: pubKey
+      username: git
+      keyFile: ./myPubKeyFile
+      keyFilePassword: myPubKeyPassword
+  local:
+    path: /tmp/vecosyData
+```
+
+
 # Configuration Repo
 
 ## Branching convention
@@ -147,198 +326,6 @@ It's also possible to add handlers to react to the changes
 ## More info
 have a look to the [integration test](https://github.com/vecosy/vecosy/blob/develop/pkg/vecosy/client_integration_test.go) for more details
 
-# Server Configuration
-*some configuration options can be passed via command line run `vecosy-server --help` for the options*
-
-## TLS
-```yaml
-server:
-  tls:
-    enabled: true
-    certificateFile: ./myCert.crt
-    keyFile: ./myCert.key
-  rest:
-    address: ":8443"
-  grpc:
-    address: ":8081"
-...
-```
-## GIT authentication
-### No authentication
-```yaml
-...
-repo:
-  remote:
-    url: https://github.com/vecosy/config-sample.git
-    pullEvery: 30s
-  local:
-    path: /tmp/vecosyData
-```
-
-### plain authentication
-```yaml
-...
-repo:
-  remote:
-    url: https://github.com/vecosy/config-sample.git
-    pullEvery: 30s
-    auth:
-      type: plain
-      username: gitRepoUsername
-      password: gitRepoPassword
-  local:
-    path: /tmp/vecosyData
-```
-
-### http (basic) authentication
-```yaml
-...
-repo:
-  remote:
-    url: https://github.com/vecosy/config-sample.git
-    pullEvery: 30s
-    auth:
-      type: http
-      username: gitRepoUsername
-      password: gitRepoPassword
-  local:
-    path: /tmp/vecosyData
-```
-
-### public key authentication
-```yaml
-...
-repo:
-  remote:
-    url: github.com:vecosy/config-sample.git
-    pullEvery: 30s
-    auth:
-      type: pubKey
-      username: git
-      keyFile: ./myPubKeyFile
-      keyFilePassword: myPubKeyPassword
-  local:
-    path: /tmp/vecosyData
-```
-
-## Full Example
-```yaml
-server:
-  tls:
-    enabled: true
-    certificateFile: ./myCert.crt
-    keyFile: ./myCert.key
-  rest:
-    address: ":8443"
-  grpc:
-    address: ":8081"
-repo:
-  remote:
-    url: github.com:vecosy/config-sample.git
-    pullEvery: 30s
-    auth:
-      type: pubKey
-      username: git
-      keyFile: ./myPubKeyFile
-      keyFilePassword: myPubKeyPassword
-  local:
-    path: /tmp/vecosyData
-```
-
-# Demo
-The demo uses the [config-sample](https://github.com/vecosy/config-sample) repository
-## Run the server
-```shell script
-$> docker pull vecosy/vecosy:demo
-$> docker run --rm  -p 8080:8080 -p 8081:8081 vecosy/vecosy:demo
-```
-
-## Golang Client 
-### Generate the JWS token
-Go to [app1/1.0.0 branch](https://github.com/vecosy/config-sample/tree/app1/1.0.0) and run
-```
-echo "app1" | jose-util sign --key priv.key --alg RS256
-```
-*the code below has already a valid token for the vecosy:demo*
-
-### Without TLS
-```
-package main
-
-import (
-	"fmt"
-	"github.com/spf13/viper"
-	"github.com/vecosy/vecosy/v2/pkg/vecosy"
-)
-
-func main() {
-	jwsToken := "eyJhbGciOiJSUzI1NiJ9.YXBwMQo.A98GFL-P3vtehn0r5GCO_a0OYb5h6trxg3a8WE9hOPDzJ40yOEGtZxyUM6_3Exk65c52-nzWEEc5P-QtgGrgJFOOZlKneKoa1bYBlWRONoysuq95UtSY0doEOMWGvI9AqB685OzmVPuW2UlHg_HlQuuTO6Re1uKc5gr1qZPlyyWEsfoVYTFbfidLoBKWPOuZTxpd8uRx0Rv3LrrmFEcGPHaMNQ2WiXAEJG6OaMTBtwKiynEFH3DU5Rx2WP9M98bH-emC_w7Zq1xKaCOsj2t09F00KohcGC49zSPgPVpp_TwF1qt6_0d0Mnh_Eqi_NHpobVvO85ZOLS05AyW9LQyA5A"
-	vecosyCl, err := vecosy.NewBuilder("localhost:8081", "app1", "1.0.0", "dev").WithJWSToken(jwsToken).Build(nil)
-	panicOnError(err)
-	err = vecosyCl.WatchChanges()
-	panicOnError(err)
-	fmt.Printf("db.user:%s\n", viper.GetString("db.user"))
-}
-
-func panicOnError(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-```
-
-### With TLS
-```
-package main
-
-import (
-	"fmt"
-	"github.com/spf13/viper"
-	"github.com/vecosy/vecosy/v2/pkg/vecosy"
-)
-
-func main() {
-    trustCert := "./myTrustCert.crt"
-	jwsToken := "eyJhbGciOiJSUzI1NiJ9.YXBwMQo.A98GFL-P3vtehn0r5GCO_a0OYb5h6trxg3a8WE9hOPDzJ40yOEGtZxyUM6_3Exk65c52-nzWEEc5P-QtgGrgJFOOZlKneKoa1bYBlWRONoysuq95UtSY0doEOMWGvI9AqB685OzmVPuW2UlHg_HlQuuTO6Re1uKc5gr1qZPlyyWEsfoVYTFbfidLoBKWPOuZTxpd8uRx0Rv3LrrmFEcGPHaMNQ2WiXAEJG6OaMTBtwKiynEFH3DU5Rx2WP9M98bH-emC_w7Zq1xKaCOsj2t09F00KohcGC49zSPgPVpp_TwF1qt6_0d0Mnh_Eqi_NHpobVvO85ZOLS05AyW9LQyA5A"
-	vecosyCl, err := vecosy.NewBuilder("localhost:8081", "app1", "1.0.0", "dev").WithJWSToken(jwsToken).WithTLS(trustCert).Build(nil)
-	panicOnError(err)
-	err = vecosyCl.WatchChanges()
-	panicOnError(err)
-	fmt.Printf("db.user:%s\n", viper.GetString("db.user"))
-}
-
-func panicOnError(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-```
-
-## Spring Client
-Take a look to [spring-boot-example](https://github.com/vecosy/spring-boot-example)
-
-## Endpoints
-Remember to add the `Authorization` header with the token generated before `Bearer [token]` 
-(except if the server has been started with `--insecure` option)
-
-### SmartConfig Strategies
-from [app1/1.0.0](https://github.com/vecosy/config-sample/tree/app1/1.0.0)
-* http://localhost:8080/v1/config/app1/1.0.0/dev
-* http://localhost:8080/v1/config/app1/1.0.0/int
-
-### Spring-could Strategies
-for [spring-app1/v1.0.0](https://github.com/vecosy/config-sample/tree/spring-app1/1.0.0) 
-* http://localhost:8080/v1/spring/v1.0.0/spring-app1/dev
-* http://localhost:8080/v1/spring/v1.0.0/spring-app1/int
-
-### Raw file
-for [app1/1.0.0](https://github.com/vecosy/config-sample/tree/app1/1.0.0)
-* http://localhost:8080/v1/raw/app1/1.0.0/config.yml
-* http://localhost:8080/v1/raw/app1/1.0.0/dev/config.yml
-
-for [spring-app1/1.0.0](https://github.com/vecosy/config-sample/tree/spring-app1/1.0.0) 
-* http://localhost:8080/v1/raw/spring-app1/1.0.0/application.yml
-* http://localhost:8080/v1/raw/spring-app1/1.0.0/spring-app1-dev.yml
 
 
 # Future features/improvements
