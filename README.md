@@ -17,7 +17,6 @@
 * REST
 * Auto update (currently only with golang client)
 
-
 # QuickStart (demo)
 The demo uses the [config-sample](https://github.com/vecosy/config-sample) repository
 ## Run the server
