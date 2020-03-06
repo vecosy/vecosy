@@ -81,7 +81,7 @@ func (vc *Client) watchChanges(watcher vecosyGrpc.WatchService_WatchClient) {
 			break
 		} else {
 			if changes.Changed {
-				oldSettings :=vc.viper.AllSettings()
+				oldSettings := vc.viper.AllSettings()
 				err = vc.UpdateConfig()
 				if err != nil {
 					logrus.Errorf("Error updating configuration :%s", err)
