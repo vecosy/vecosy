@@ -1,0 +1,51 @@
+syntax = "proto3";
+package grpcapi;
+
+service SmartConfig {
+    rpc GetConfig (GetConfigRequest) returns (GetConfigResponse) {
+    }
+}
+
+message GetConfigRequest {
+    string appName = 1;
+    string appVersion = 2;
+    string environment = 3;
+}
+
+message GetConfigResponse {
+    string configContent = 1;
+}
+
+service Raw {
+    rpc GetFile (GetFileRequest) returns (GetFileResponse) {
+    }
+}
+
+message GetFileResponse {
+    bytes fileContent = 1;
+}
+
+message GetFileRequest {
+    string appName = 1;
+    string appVersion = 2;
+    string filePath = 3;
+}
+
+service WatchService {
+    rpc Watch (WatchRequest) returns (stream WatchResponse) {
+    }
+}
+
+message Application {
+    string appName = 1;
+    string appVersion = 2;
+}
+
+message WatchRequest {
+    string watcherName = 1;
+    Application application = 2;
+}
+
+message WatchResponse {
+    bool changed = 1;
+}
