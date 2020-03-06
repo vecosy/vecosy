@@ -1,6 +1,6 @@
 module github.com/vecosy/vecosy/v2
 
-go 1.13
+go 1.14
 
 require (
 	github.com/ajg/form v1.5.1 // indirect
