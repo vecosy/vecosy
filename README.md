@@ -21,19 +21,20 @@
 The demo uses the [config-sample](https://github.com/vecosy/config-sample) repository
 ## Run the server
 ```shell script
-$> docker pull vecosy/vecosy:demo
-$> docker run --rm  -p 8080:8080 -p 8081:8081 vecosy/vecosy:demo
+$ docker pull vecosy/vecosy:demo
+$ docker run --rm  -p 8080:8080 -p 8081:8081 vecosy/vecosy:demo
 ```
 
 ### Generate the JWS token
 Use the [app1/1.0.0 branch](https://github.com/vecosy/config-sample/tree/app1/1.0.0) to run
-```
-echo "app1" | jose-util sign --key priv.key --alg RS256
+```shell script
+$ echo "app1" | jose-util sign --key priv.key --alg RS256
 ```
 *the code below has already a valid token for the vecosy:demo*
 
 ## Golang Client 
-```
+[Example repo](https://github.com/vecosy/golang-client-example)
+```go
 package main
 
 import (
@@ -89,7 +90,7 @@ for [spring-app1/1.0.0](https://github.com/vecosy/config-sample/tree/spring-app1
 ## Prepare the configuration
 Create a folder for the server configuration `$HOME/myVecosyConf`.
 
-Create a `$HOME/myVecosyConf/vecosy.yml`with your configuration (see [configuration](#Server Configuration) chapter)
+Create a `$HOME/myVecosyConf/vecosy.yml`with your configuration (see Server Configuration chapter)
 
 ## Run
 ```shell script
@@ -233,7 +234,7 @@ Every application branch has to contains a `pub.key` file with the public key of
 
 ## Example 
 ### 1. Generate the application keys
-```
+```shell script
 $ openssl genrsa -out priv.key 2048
 $ openssl rsa -in priv.key -outform PEM -pubout -out pub.key
 ```
@@ -245,12 +246,12 @@ and should be saved in an external safe place like [vault](https://www.vaultproj
 
 ### 2. generate a jws token
 #### install jose-util
-```
+```shell script
 $ go get -u github.com/square/go-jose/jose-util
 $ go install github.com/square/go-jose/jose-util
 ```
 #### generate jws token
-```
+```shell script
 # the jws payload is not important
 $ echo "myAppName" | jose-util sign --key priv.key --alg RS256
 ```
@@ -259,7 +260,7 @@ the generated token can be used as *Bearer* Authorization header, in the `token`
 ### 3. Configure your application to use the JWS token
 
 #### vecosy-client (golang)
-passing on the `vecosy.NewBuilder(...).WithJWSToken(jwsToken)` parameter 
+passing on the `vecosy.NewClientBuilder(...).WithJWSToken(jwsToken)` parameter 
 
 #### Spring-cloud application (java)
 by Spring cloud configuration [token](https://github.com/vecosy/spring-boot-example/blob/master/src/main/resources/bootstrap.yml)
@@ -271,9 +272,9 @@ the `--insecure` command line option will disable the security system.
 Vecosy client use [viper](https://github.com/spf13/viper) as configuration system. 
 
 ## Specific viper configuration
-```
+```go
     cfg := viper.New()
-    vecosyCl,err := vecosy.NewBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
+    vecosyCl,err := vecosy.NewClientBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
         WithJWStoken(jwsToken).
         Build(cfg)
     // now you can use cfg to get the your app configuration
@@ -281,8 +282,8 @@ Vecosy client use [viper](https://github.com/spf13/viper) as configuration syste
 ```
 
 ## Default viper configuration 
-```
-    vecosyCl,err := vecosy.NewBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
+```go
+    vecosyCl,err := vecosy.NewClientBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
         WithJWStoken(jwsToken).
         Build(nil)
     viper.getString("my.app.config")
@@ -290,16 +291,16 @@ Vecosy client use [viper](https://github.com/spf13/viper) as configuration syste
 
 ## Insecure connection 
 The server has to be started with `--insecure` option
-```
-    vecosyCl,err := vecosy.NewBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
+```go
+    vecosyCl,err := vecosy.NewClientBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
         Insecure().
         Build(nil)
     viper.getString("my.app.config")
 ```
 
 ## TLS connection
-```
-    vecosyCl,err:= vecosy.NewBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
+```go
+    vecosyCl,err:= vecosy.NewClientBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
         WithTLS("./myTrust.crt").
         WithJWSToken(jwsToken).
         Build(nil)
@@ -307,8 +308,8 @@ The server has to be started with `--insecure` option
 ```
 
 ## Watch changes
-```
-    vecosyCl,err:= vecosy.NewBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
+```go
+    vecosyCl,err:= vecosy.NewClientBuilder("my-vecosy-server:8080","myApp", "myAppVersion", "integration").
         WithJWStoken(jwsToken).
         Build(nil)
     vecosyCl.WatchChanges()
@@ -316,7 +317,7 @@ The server has to be started with `--insecure` option
 This will maintain a GRPC connection with the server that will inform the client on every configuration changes on the git repo.
 
 It's also possible to add handlers to react to the changes
-```
+```go
     vecosyCl.AddOnChangeHandler(func() {
         fmt.Println("something has changed")
     })
@@ -324,8 +325,6 @@ It's also possible to add handlers to react to the changes
 
 ## More info
 have a look to the [integration test](https://github.com/vecosy/vecosy/blob/develop/pkg/vecosy/client_integration_test.go) for more details
-
-
 
 # Future features/improvements
 * web interface
