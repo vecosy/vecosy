@@ -34,7 +34,7 @@ func (cr *GitConfigRepo) StopFetching() {
 
 // Fetch fetch from the remote git repo
 func (cr *GitConfigRepo) Fetch() error {
-	logrus.Info("Fetch")
+	logrus.Debug("Fetch")
 	if cr.cloneOpts != nil {
 		fetchOpts := &git.FetchOptions{Auth: cr.cloneOpts.Auth, Force: true, Tags: git.AllTags}
 		err := cr.repo.Fetch(fetchOpts)
@@ -43,7 +43,7 @@ func (cr *GitConfigRepo) Fetch() error {
 				logrus.Errorf("Error fetching :%s", err)
 				return err
 			}
-			logrus.Info("already up to date")
+			logrus.Debug("already up to date")
 		} else {
 			newApps, err := cr.loadApps()
 			if err != nil {
@@ -100,7 +100,7 @@ func detectChanges(oldApps, newApps map[string]*app) []configrepo.ApplicationVer
 }
 
 func (cr *GitConfigRepo) callChangeHandlers(changes []configrepo.ApplicationVersion) {
-	logrus.Infof("callChangeHandlers: %+v", changes)
+	logrus.Debugf("callChangeHandlers: %+v", changes)
 	for _, chHandler := range cr.changesHandlers {
 		for _, change := range changes {
 			chHandler(change)
