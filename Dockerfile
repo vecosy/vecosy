@@ -1,4 +1,4 @@
-FROM golang:latest as builder
+FROM golang:1.13 as builder
 ARG VCS_REF
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.vcs-ref=$VCS_REF \
@@ -7,7 +7,7 @@ WORKDIR /go/src
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o vecosy-server
 
-FROM golang:latest
+FROM alpine:latest
 RUN mkdir /config
 EXPOSE 8080
 EXPOSE 8081

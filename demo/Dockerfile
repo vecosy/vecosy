@@ -1,4 +1,4 @@
-FROM golang:latest as builder
+FROM golang:1.13 as builder
 WORKDIR /go/src
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o vecosy-server
