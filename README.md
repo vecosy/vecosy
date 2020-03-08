@@ -8,14 +8,47 @@
 ![GitHub](https://img.shields.io/github/license/vecosy/vecosy)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvecosy%2Fvecosy.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvecosy%2Fvecosy?ref=badge_shield)
 
-![](./docs/schema.png)
 
-## Features
-* configurable by a GIT repo
-* GRPC
-* Spring cloud configuration compatible
-* REST
-* Auto update (currently only with golang client)
+# What is Vecosy
+Vecosy is a configuration service exposed through REST/GRPC.
+
+Is Spring Cloud Conf compatible and also provide a Golang client.
+
+The Golang client (or any other GRPC client) has the ability to detect the configuration changes maintaining a connection 
+to the server via a GRPC stream.
+
+A configuration is identified by three elements: **application name**, **application version** and the **environment**. 
+
+Vecosy uses a GIT repository as configuration store with a naming convention to identify the correct application branch (`appName/appVersion`),
+
+The system will find the closest (<=) version **very useful when a new release doesn't need any configuration changes*
+
+The security is guaranteed by a JWS token for each application branch and via a TLS connection.
+
+Each application branch can use three different structures/merging strategies: **smartConfig**, **spring**, **raw** (see [Configuration repo](#confRepo) for more details)
+## Logical schema
+
+<p align="center">
+    <img src="docs/schema.png" alt="Schema"/>
+</p>
+
+# Why VeCoSy (*Versioned Configuration System*)
+
+* Easy to use
+  * GIT repo (see [config-sample](https://github.com/vecosy/config-sample))
+  * docker image
+* Secure
+  * JWS token for each application
+  * TLS
+* Three different merging strategies
+  * Smart
+  * Spring
+  * Raw
+* Compatible
+  * Spring Cloud Conf (see [spring cloud example](https://github.com/vecosy/spring-boot-example))
+  * Golang Viper (see [golang example](https://github.com/vecosy/golang-client-example))
+  * GRPC  (with detection system)
+  * REST
 
 # QuickStart (demo)
 The demo uses the [config-sample](https://github.com/vecosy/config-sample) repository
@@ -86,7 +119,7 @@ for [spring-app1/1.0.0](https://github.com/vecosy/config-sample/tree/spring-app1
 * http://localhost:8080/v1/raw/spring-app1/1.0.0/spring-app1-dev.yml
 
 
-# Docker run
+# Installation
 ## Prepare the configuration
 Create a folder for the server configuration `$HOME/myVecosyConf`.
 
@@ -196,7 +229,7 @@ repo:
 ```
 
 
-# Configuration Repo
+# <a name="confRepo">Configuration Repo</a>
 
 ## Branching convention
 The app configuration is stored in a git repository, vecosy use a branch name convention to manage different configuration on the same repository  `appName/version`
@@ -318,8 +351,8 @@ This will maintain a GRPC connection with the server that will inform the client
 
 It's also possible to add handlers to react to the changes
 ```go
-    vecosyCl.AddOnChangeHandler(func() {
-        fmt.Println("something has changed")
+    vecosyCl.AddOnChangeHandler(func(prevConfiguration map[string]interface{}) {
+        fmt.Printf("something has changed from %+v to %+v",prevConfiguration, viper.AllSettings())
     })
 ```
 
